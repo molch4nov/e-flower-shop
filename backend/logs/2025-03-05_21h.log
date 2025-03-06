@@ -1,0 +1,25 @@
+{"level":30,"time":"2025-03-05T18:00:36.042Z","module":"server","msg":"Сервер запущен на порту 3000 [development]"}
+{"level":30,"time":"2025-03-05T18:00:39.061Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:01:11.708Z","module":"server","msg":"Сервер запущен на порту 3000 [development]"}
+{"level":30,"time":"2025-03-05T18:01:16.871Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:04:42.852Z","module":"server","msg":"Сервер запущен на порту 3000"}
+{"level":30,"time":"2025-03-05T18:04:42.852Z","module":"server","msg":"Документация Swagger доступна по адресу: http://localhost:3000/api-docs"}
+{"level":30,"time":"2025-03-05T18:04:43.194Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:05:08.298Z","module":"server","msg":"Сервер запущен на порту 3000"}
+{"level":30,"time":"2025-03-05T18:05:08.299Z","module":"server","msg":"Документация Swagger доступна по адресу: http://localhost:3000/api-docs"}
+{"level":30,"time":"2025-03-05T18:05:08.640Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:05:13.754Z","module":"server","msg":"Сервер запущен на порту 3000"}
+{"level":30,"time":"2025-03-05T18:05:13.754Z","module":"server","msg":"Документация Swagger доступна по адресу: http://localhost:3000/api-docs"}
+{"level":30,"time":"2025-03-05T18:05:13.905Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:05:18.007Z","module":"server","msg":"Сервер запущен на порту 3000"}
+{"level":30,"time":"2025-03-05T18:05:18.007Z","module":"server","msg":"Документация Swagger доступна по адресу: http://localhost:3000/api-docs"}
+{"level":30,"time":"2025-03-05T18:05:18.236Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:05:19.251Z","module":"server","msg":"Сервер запущен на порту 3000"}
+{"level":30,"time":"2025-03-05T18:05:19.251Z","module":"server","msg":"Документация Swagger доступна по адресу: http://localhost:3000/api-docs"}
+{"level":30,"time":"2025-03-05T18:05:19.424Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:05:21.185Z","module":"server","msg":"Сервер запущен на порту 3000"}
+{"level":30,"time":"2025-03-05T18:05:21.185Z","module":"server","msg":"Документация Swagger доступна по адресу: http://localhost:3000/api-docs"}
+{"level":30,"time":"2025-03-05T18:05:21.433Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-05T18:05:23.180Z","module":"server","msg":"Сервер запущен на порту 3000"}
+{"level":30,"time":"2025-03-05T18:05:23.180Z","module":"server","msg":"Документация Swagger доступна по адресу: http://localhost:3000/api-docs"}
+{"level":30,"time":"2025-03-05T18:05:37.494Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
