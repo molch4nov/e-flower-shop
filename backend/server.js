@@ -16,7 +16,9 @@ const PORT = process.env.PORT || 3000;
 app.set("trust proxy", true);
 
 // Middleware
-app.use(helmet()); // Безопасность
+app.use(helmet({
+  contentSecurityPolicy: false // Отключаем CSP для простоты разработки
+})); // Безопасность
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*', // Используем значение из .env или разрешаем все
   credentials: true // Разрешить отправку cookies
@@ -56,6 +58,18 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true })
 // API маршруты
 app.use('/api', routes);
 
+// Статические файлы для фронтенда
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Маршрут для обслуживания React/SPA приложения
+app.get('*', (req, res, next) => {
+  // Если запрос к API или админке, передаем управление следующему обработчику
+  if (req.path.startsWith('/api') || req.path.startsWith('/api-docs') || req.path.startsWith('/admin')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
 // Обработка ошибок
 app.use((err, req, res, next) => {
   logger.error({
@@ -82,6 +96,7 @@ if (require.main === module) {
   app.listen(PORT, () => {
     logger.info(`Сервер запущен на порту ${PORT}`);
     logger.info(`Документация Swagger доступна по адресу: http://localhost:${PORT}/api-docs`);
+    logger.info(`Фронтенд доступен по адресу: http://localhost:${PORT}`);
   });
 }
 

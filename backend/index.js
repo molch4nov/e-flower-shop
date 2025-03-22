@@ -18,11 +18,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Настройка доверия к прокси
-app.set("trust proxy", true);
+// app.set("trust proxy", true);
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*', // Используем значение из .env или разрешаем все
+  origin: '*' | process.env.CORS_ORIGIN, // Используем значение из .env или разрешаем все
   credentials: true // Разрешить отправку cookies
 }));
 app.use(express.json()); // Парсинг JSON-запросов

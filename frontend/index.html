@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин цветов</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Магазин цветов</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" id="home-link">Главная</a></li>
+                    <li><a href="#" id="products-link">Цветы</a></li>
+                    <li><a href="#" id="categories-link">Категории</a></li>
+                    <li><a href="#" id="reviews-link">Отзывы</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="loading" class="hidden">Загрузка...</div>
+        <div id="error-message" class="hidden"></div>
+        
+        <section id="home-section" class="section">
+            <h2>Добро пожаловать в наш магазин цветов</h2>
+            <p>Выберите раздел в меню выше, чтобы начать.</p>
+        </section>
+
+        <section id="products-section" class="section hidden">
+            <h2>Цветы</h2>
+            <div id="products-container" class="card-grid"></div>
+        </section>
+
+        <section id="categories-section" class="section hidden">
+            <h2>Категории</h2>
+            <div id="categories-container"></div>
+        </section>
+
+        <section id="reviews-section" class="section hidden">
+            <h2>Отзывы</h2>
+            <div id="reviews-container"></div>
+            <button id="add-review-btn" class="btn">Добавить отзыв</button>
+            
+            <div id="review-form-container" class="hidden">
+                <h3>Добавить отзыв</h3>
+                <form id="review-form">
+                    <div class="form-group">
+                        <label for="review-title">Заголовок</label>
+                        <input type="text" id="review-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="review-description">Описание</label>
+                        <textarea id="review-description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="review-rating">Оценка</label>
+                        <select id="review-rating" required>
+                            <option value="5">5 - Отлично</option>
+                            <option value="4">4 - Хорошо</option>
+                            <option value="3">3 - Нормально</option>
+                            <option value="2">2 - Плохо</option>
+                            <option value="1">1 - Ужасно</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Отправить</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-review-btn">Отмена</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Магазин цветов. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
