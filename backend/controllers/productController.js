@@ -70,7 +70,7 @@ exports.createNormalProduct = async (req, res) => {
 
 exports.createBouquet = async (req, res) => {
   try {
-    const { name, description, subcategory_id, flowers } = req.body;
+    const { name, description, subcategory_id, flowers, price } = req.body;
     
     if (!name || !description || !subcategory_id || !flowers || !Array.isArray(flowers) || flowers.length === 0) {
       return res.status(400).json({ 
@@ -90,7 +90,8 @@ exports.createBouquet = async (req, res) => {
       name, 
       description, 
       subcategory_id,
-      flowers
+      flowers,
+      price
     };
     
     const newBouquet = await Product.createBouquet(bouquetData);
@@ -135,7 +136,7 @@ exports.updateProduct = async (req, res) => {
       
       updatedProduct = await Product.updateNormalProduct(id, productData);
     } else if (type === 'bouquet') {
-      const { name, description, subcategory_id, flowers } = req.body;
+      const { name, description, subcategory_id, flowers, price } = req.body;
       
       if (!name || !description || !subcategory_id || !flowers || !Array.isArray(flowers) || flowers.length === 0) {
         return res.status(400).json({ 
@@ -155,7 +156,8 @@ exports.updateProduct = async (req, res) => {
         name, 
         description, 
         subcategory_id,
-        flowers
+        flowers,
+        price
       };
       
       updatedProduct = await Product.updateBouquet(id, bouquetData);

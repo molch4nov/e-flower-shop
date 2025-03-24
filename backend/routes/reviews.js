@@ -15,7 +15,7 @@ const reviewController = require('../controllers/reviewController');
  *   schemas:
  *     Review:
  *       type: object
- *       required: [title, description, rating, parent_id, parent_type]
+ *       required: [title, description, rating, parent_id]
  *       properties:
  *         id:
  *           type: string
@@ -36,9 +36,6 @@ const reviewController = require('../controllers/reviewController');
  *           type: string
  *           format: uuid
  *           description: ID родительской сущности
- *         parent_type:
- *           type: string
- *           description: Тип родительской сущности (category, subcategory и т.д.)
  *         created_at:
  *           type: string
  *           format: date-time
@@ -239,9 +236,6 @@ router.post('/', reviewController.createReview);
  *                 type: string
  *                 format: uuid
  *                 description: ID родительской сущности
- *               parent_type:
- *                 type: string
- *                 description: Тип родительской сущности (category, subcategory и т.д.)
  *     responses:
  *       200:
  *         description: Отзыв обновлен

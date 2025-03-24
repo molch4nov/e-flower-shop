@@ -73,7 +73,7 @@ export default function Products() {
           to="/products/new"
           className="btn btn-primary flex items-center"
         >
-          <PlusIcon className="h-5 w-5 mr-2" />
+          
           Добавить товар
         </Link>
       </div>
@@ -125,7 +125,7 @@ export default function Products() {
                     <div className="text-sm text-gray-500">{formatPrice(product.price)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {renderRating(product.rating)}
+                    {product.rating}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-3">
@@ -133,13 +133,13 @@ export default function Products() {
                         to={`/products/${product.id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >
-                        <PencilIcon className="h-5 w-5" aria-hidden="true" />
+                        Редактировать
                       </Link>
                       <button
                         onClick={() => handleDelete(product.id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                        Удалить
                       </button>
                     </div>
                   </td>

@@ -3,14 +3,7 @@ const db = require('../config/db');
 class Subcategory {
   static async getAll() {
     const query = `
-      SELECT s.id, s.name, s.category_id, s.created_at, s.updated_at,
-        json_build_object(
-          'id', c.id,
-          'name', c.name
-        ) AS category
-      FROM subcategories s
-      JOIN categories c ON s.category_id = c.id
-      ORDER BY s.name;
+      SELECT * FROM subcategories;
     `;
     
     try {

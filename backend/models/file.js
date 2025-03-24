@@ -65,7 +65,7 @@ class File {
     const query = `
       DELETE FROM files
       WHERE id = $1
-      RETURNING id, filename, mimetype, parent_id, parent_type;
+      RETURNING id, filename, mimetype, parent_id;
     `;
     
     try {

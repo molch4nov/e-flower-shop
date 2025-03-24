@@ -43,6 +43,30 @@ router.get('/', categoryController.getAllCategories);
 
 /**
  * @swagger
+ * /categories/subcategories:
+ *   get:
+ *     summary: Получить список всех подкатегорий
+ *     tags: [Subcategories]
+ *     responses:
+ *       200:
+ *         description: Список подкатегорий
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Subcategory'
+ *       500:
+ *         description: Ошибка сервера
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/subcategories', subcategoryController.getAllSubcategories);
+
+/**
+ * @swagger
  * /categories/{id}:
  *   get:
  *     summary: Получить категорию по ID
@@ -432,29 +456,5 @@ router.put('/subcategories/:id', subcategoryController.updateSubcategory);
  *               $ref: '#/components/schemas/Error'
  */
 router.delete('/subcategories/:id', subcategoryController.deleteSubcategory);
-
-/**
- * @swagger
- * /categories/subcategories:
- *   get:
- *     summary: Получить список всех подкатегорий
- *     tags: [Subcategories]
- *     responses:
- *       200:
- *         description: Список подкатегорий
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Subcategory'
- *       500:
- *         description: Ошибка сервера
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.get('/subcategories', subcategoryController.getAllSubcategories);
 
 module.exports = router; 

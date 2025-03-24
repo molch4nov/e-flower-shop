@@ -165,10 +165,6 @@ const options = {
               format: 'uuid',
               description: 'ID родительской сущности',
             },
-            parent_type: {
-              type: 'string',
-              description: 'Тип родительской сущности (например, review)',
-            },
             created_at: {
               type: 'string',
               format: 'date-time',
@@ -201,10 +197,6 @@ const options = {
               type: 'string',
               format: 'uuid',
               description: 'ID родительской сущности (отзыва, категории и т.д.)',
-            },
-            parent_type: {
-              type: 'string',
-              description: 'Тип родительской сущности (review, category, subcategory и т.д.)',
             },
             created_at: {
               type: 'string',

@@ -54,7 +54,7 @@ export default function Files() {
           to="/files/upload"
           className="btn btn-primary flex items-center"
         >
-          <PlusIcon className="h-5 w-5 mr-2" />
+          
           Загрузить файл
         </Link>
       </div>
@@ -117,7 +117,7 @@ export default function Files() {
                         onClick={() => handleDelete(file.id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                        Удалить
                       </button>
                     </div>
                   </td>

@@ -48,20 +48,20 @@ exports.getSubcategoriesByCategoryId = async (req, res) => {
 
 exports.createSubcategory = async (req, res) => {
   try {
-    const { name, categoryId } = req.body;
+    const { name, category_id } = req.body;
     
-    if (!name || !categoryId) {
+    if (!name || !category_id) {
       return res.status(400).json({ error: 'Имя и ID категории обязательны' });
     }
     
     // Проверяем, существует ли категория
-    const category = await Category.getById(categoryId);
+    const category = await Category.getById(category_id);
     
     if (!category) {
       return res.status(404).json({ error: 'Категория не найдена' });
     }
     
-    const newSubcategory = await Subcategory.create(name, categoryId);
+    const newSubcategory = await Subcategory.create(name, category_id);
     res.status(201).json(newSubcategory);
   } catch (error) {
     logger.error(error, 'Ошибка при создании подкатегории');

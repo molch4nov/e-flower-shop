@@ -1,31 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { categoriesApi } from '../../services/api';
 
-export default function CategoryForm() {
+const CategoryForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [category, setCategory] = useState({ name: '' });
-  const [loading, setLoading] = useState(false);
+  const isEditing = Boolean(id);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    order: 0,
+  });
+  
+  const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
-  const isEdit = !!id;
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isEdit) {
+    if (isEditing) {
       fetchCategory();
     }
-  }, [id]);
+  }, [id, isEditing]);
 
   const fetchCategory = async () => {
     try {
       setLoading(true);
       const response = await categoriesApi.getById(id);
-      setCategory(response.data);
+      setFormData(response.data);
     } catch (error) {
       console.error('Error fetching category:', error);
+      setError('Ошибка при загрузке категории');
       toast.error('Ошибка при загрузке категории');
-      navigate('/categories');
     } finally {
       setLoading(false);
     }
@@ -33,30 +40,27 @@ export default function CategoryForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCategory(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!category.name.trim()) {
-      toast.error('Название категории обязательно');
-      return;
-    }
+    setSaving(true);
+    setError(null);
     
     try {
-      setSaving(true);
-      if (isEdit) {
-        await categoriesApi.update(id, { name: category.name });
+      if (isEditing) {
+        await categoriesApi.update(id, formData);
         toast.success('Категория успешно обновлена');
       } else {
-        await categoriesApi.create({ name: category.name });
+        await categoriesApi.create(formData);
         toast.success('Категория успешно создана');
       }
       navigate('/categories');
-    } catch (error) {
-      console.error('Error saving category:', error);
-      toast.error(`Ошибка при ${isEdit ? 'обновлении' : 'создании'} категории`);
+    } catch (err) {
+      setError(`Ошибка при ${isEditing ? 'обновлении' : 'создании'} категории`);
+      console.error(err);
+      toast.error(`Ошибка при ${isEditing ? 'обновлении' : 'создании'} категории`);
     } finally {
       setSaving(false);
     }
@@ -64,67 +68,96 @@ export default function CategoryForm() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700"></div>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">
-          {isEdit ? 'Редактировать категорию' : 'Создать категорию'}
+        <h1 className="text-2xl font-bold text-gray-800">
+          {isEditing ? 'Редактирование категории' : 'Создание новой категории'}
         </h1>
+        <Link 
+          to="/categories" 
+          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors duration-200"
+        >
+          ← Назад к списку
+        </Link>
       </div>
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Название
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              Название *
             </label>
             <input
               type="text"
               id="name"
               name="name"
-              value={category.name}
-              onChange={handleChange}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              placeholder="Введите название категории"
               required
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              placeholder="Введите название категории"
             />
           </div>
 
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => navigate('/categories')}
-              disabled={saving}
-            >
-              Отмена
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={saving}
-            >
-              {saving ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Сохранение...
-                </span>
-              ) : (
-                'Сохранить'
-              )}
-            </button>
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              Описание
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              rows="4"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              placeholder="Введите описание категории"
+            ></textarea>
           </div>
-        </form>
-      </div>
+
+          <div>
+            <label htmlFor="order" className="block text-sm font-medium text-gray-700 mb-1">
+              Порядок отображения
+            </label>
+            <input
+              type="number"
+              id="order"
+              name="order"
+              value={formData.order}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              min="0"
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              Чем меньше число, тем выше будет отображаться категория
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-4 border-t border-gray-200">
+          <button
+            type="submit"
+            disabled={saving}
+            className={`px-6 py-3 bg-primary hover:bg-secondary text-white rounded-lg transition-colors duration-200 ${saving ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            {saving ? 'Сохранение...' : 'Сохранить'}
+          </button>
+        </div>
+      </form>
     </div>
   );
-} 
+};
+
+export default CategoryForm;

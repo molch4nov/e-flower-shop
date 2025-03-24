@@ -60,7 +60,7 @@ exports.createReview = async (req, res) => {
       title,
       description,
       rating: ratingNum,
-      parent_id
+      parent_id,
     };
 
     const newReview = await Review.create(reviewData);
@@ -93,7 +93,7 @@ exports.updateReview = async (req, res) => {
       title,
       description,
       rating: ratingNum,
-      parent_id
+      parent_id,
     };
 
     const updatedReview = await Review.update(id, reviewData);

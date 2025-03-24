@@ -306,6 +306,10 @@ router.post('/normal', productController.createNormalProduct);
  *               description:
  *                 type: string
  *                 description: Описание букета
+ *               price:
+ *                 type: number
+ *                 format: float
+ *                 description: Цена букета
  *               subcategory_id:
  *                 type: string
  *                 format: uuid

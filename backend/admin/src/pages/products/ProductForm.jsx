@@ -174,11 +174,22 @@ export default function ProductForm() {
       setSaving(true);
       
       // Формируем данные для отправки
-      const productData = { ...product };
+      const productData = { 
+        name: product.name,
+        description: product.description,
+        subcategory_id: product.subcategory_id,
+        type: product.type
+      };
       
       if (product.type === 'bouquet') {
-        // Для букета устанавливаем вычисленную цену
-        productData.price = calculateTotalPrice();
+        // Добавляем массив цветов для букета
+        productData.flowers = bouquetFlowers.map(flower => ({
+          flower_id: flower.flower_id,
+          quantity: flower.quantity
+        }));
+      } else {
+        // Для обычного товара берем введенную цену
+        productData.price = product.price;
       }
       
       let savedProduct;
@@ -189,22 +200,26 @@ export default function ProductForm() {
         savedProduct = response.data;
         toast.success('Товар успешно обновлен');
       } else {
-        // Создаем новый товар
-        const response = await productsApi.create(productData);
-        savedProduct = response.data;
+        if (product.type === 'normal') {
+          const response = await productsApi.createProduct(productData);
+          savedProduct = response.data;
+        } else {
+          const response = await productsApi.createBouquet(productData);
+          savedProduct = response.data;
+        }
+
         toast.success('Товар успешно создан');
       }
       
-      // Если это букет, обновляем связи с цветами
-      if (product.type === 'bouquet') {
+      // Если это букет, но не передаем массив цветов в запросе
+      // (оставляем этот код на случай, если бэкенд не поддерживает создание букета с цветами)
+      if (product.type === 'bouquet' && isEdit) {
         const productId = savedProduct.id || id;
         
         // Если редактируем существующий букет, сначала удаляем все связи
-        if (isEdit) {
-          const existingFlowers = await productsApi.getBouquetFlowers(productId);
-          for (const flower of existingFlowers.data) {
-            await productsApi.removeFlowerFromBouquet(flower.id);
-          }
+        const existingFlowers = await productsApi.getBouquetFlowers(productId);
+        for (const flower of existingFlowers.data) {
+          await productsApi.removeFlowerFromBouquet(flower.id);
         }
         
         // Добавляем новые связи
@@ -220,7 +235,11 @@ export default function ProductForm() {
       navigate('/products');
     } catch (error) {
       console.error('Error saving product:', error);
-      toast.error(`Ошибка при ${isEdit ? 'обновлении' : 'создании'} товара`);
+      if (error.message === "Название, описание, ID подкатегории и массив цветов обязательны") {
+        toast.error('Необходимо заполнить все обязательные поля и добавить цветы в букет');
+      } else {
+        toast.error(`Ошибка при ${isEdit ? 'обновлении' : 'создании'} товара`);
+      }
     } finally {
       setSaving(false);
     }
@@ -426,7 +445,7 @@ export default function ProductForm() {
                                 onClick={() => handleRemoveFlower(index)}
                                 className="text-red-600 hover:text-red-900"
                               >
-                                <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                                Удалить
                               </button>
                             </td>
                           </tr>

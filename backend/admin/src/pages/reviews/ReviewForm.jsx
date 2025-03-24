@@ -150,11 +150,7 @@ export default function ReviewForm() {
                   onClick={() => setRating(star)}
                   className="focus:outline-none"
                 >
-                  <StarIcon 
-                    className={`h-8 w-8 ${
-                      star <= review.rating ? 'text-yellow-400' : 'text-gray-300'
-                    }`} 
-                  />
+                  {star}
                 </button>
               ))}
             </div>

@@ -134,6 +134,7 @@ class Product {
   }
 
   static async createBouquet(bouquetData) {
+    console.log('Bouquet data:', bouquetData);
     const client = await db.getClient();
     
     try {
@@ -149,7 +150,7 @@ class Product {
       const productResult = await client.query(productQuery, [
         bouquetData.name, 
         bouquetData.description, 
-        bouquetData.subcategory_id
+        bouquetData.subcategory_id,
       ]);
       
       const bouquetId = productResult.rows[0].id;
@@ -163,28 +164,31 @@ class Product {
         
         await client.query(bouquetFlowerQuery, [
           bouquetId,
-          flower.id,
+          flower.flower_id,
           flower.quantity
         ]);
       }
       
-      // Пересчитываем цену букета
-      await client.query(`
-        UPDATE products p
-        SET price = (
-          SELECT SUM(f.price * bf.quantity)
-          FROM bouquet_flowers bf
-          JOIN flowers f ON bf.flower_id = f.id
-          WHERE bf.bouquet_id = p.id
-        )
-        WHERE id = $1
-      `, [bouquetId]);
+      // Пересчитываем цену букета, если цена не была передана
+      if (!bouquetData.price) {
+        await client.query(`
+          UPDATE products p
+          SET price = (
+            SELECT SUM(f.price * bf.quantity)
+            FROM bouquet_flowers bf
+            JOIN flowers f ON bf.flower_id = f.id
+            WHERE bf.bouquet_id = p.id
+          )
+          WHERE id = $1
+        `, [bouquetId]);
+      }
       
       // Получаем обновленные данные букета
       const bouquetQuery = `
         SELECT p.*, json_agg(
           json_build_object(
-            'id', f.id, 
+            'id', bf.id,
+            'flower_id', f.id, 
             'name', f.name,
             'price', f.price,
             'quantity', bf.quantity
@@ -274,7 +278,11 @@ class Product {
         totalPrice += flowerPrice * quantity;
       }
       
-      // Обновляем цену букета
+      // Обновляем цену букета если она не указана в запросе
+      if (bouquetData.price) {
+        totalPrice = bouquetData.price;
+      }
+      
       const updatePriceQuery = `
         UPDATE products
         SET price = $1, updated_at = CURRENT_TIMESTAMP
@@ -284,6 +292,9 @@ class Product {
       
       const updatedResult = await client.query(updatePriceQuery, [totalPrice, id]);
       const updatedBouquet = updatedResult.rows[0];
+      
+      // Получаем информацию о цветах в букете
+      updatedBouquet.flowers = await this.getBouquetFlowers(id);
       
       await client.query('COMMIT');
       return updatedBouquet;
@@ -315,9 +326,9 @@ class Product {
     const query = `
       UPDATE products
       SET rating = (
-        SELECT COALESCE(AVG(rating), 0)
+        SELECT AVG(rating)
         FROM reviews
-        WHERE parent_id = $1 AND parent_type = 'product'
+        WHERE parent_id = $1
       )
       WHERE id = $1
       RETURNING rating;

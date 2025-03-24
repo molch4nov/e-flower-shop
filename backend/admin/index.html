@@ -9,10 +9,34 @@
       name="description"
       content="Админ-панель для управления цветочным магазином"
     />
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Дополнительная настройка Tailwind с плагинами -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#6d28d9',
+              secondary: '#8b5cf6',
+            }
+          }
+        },
+        plugins: [
+          // Добавляем плагин форм, это позволит стилизовать формы
+          function({ addBase, theme }) {
+            addBase({
+              'h1': { fontSize: theme('fontSize.2xl'), fontWeight: theme('fontWeight.bold') },
+              'h2': { fontSize: theme('fontSize.xl'), fontWeight: theme('fontWeight.semibold') },
+            })
+          }
+        ]
+      }
+    </script>
     <title>Админ-панель | Цветочный магазин</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
-</html> 
+</html>

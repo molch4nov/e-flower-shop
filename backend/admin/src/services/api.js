@@ -26,11 +26,11 @@ export const categoriesApi = {
   delete: (id) => api.delete(`/categories/${id}`),
   
   // Подкатегории
-  getAllSubcategories: () => api.get('/subcategories'),
-  getSubcategoryById: (id) => api.get(`/subcategories/${id}`),
-  createSubcategory: (data) => api.post('/subcategories', data),
-  updateSubcategory: (id, data) => api.put(`/subcategories/${id}`, data),
-  deleteSubcategory: (id) => api.delete(`/subcategories/${id}`)
+  getAllSubcategories: () => api.get('/categories/subcategories'),
+  getSubcategoryById: (id) => api.get(`/categories/subcategories/${id}`),
+  createSubcategory: (data) => api.post('/categories/subcategories', data),
+  updateSubcategory: (id, data) => api.put(`/categories/subcategories/${id}`, data),
+  deleteSubcategory: (id) => api.delete(`/categories/subcategories/${id}`)
 };
 
 export const reviewsApi = {
@@ -63,7 +63,8 @@ export const flowersApi = {
 export const productsApi = {
   getAll: () => api.get('/products'),
   getById: (id) => api.get(`/products/${id}`),
-  create: (data) => api.post('/products', data),
+  createProduct: (data) => api.post('/products/normal', data),
+  createBouquet: (data) => api.post('/products/bouquet', data),
   update: (id, data) => api.put(`/products/${id}`, data),
   delete: (id) => api.delete(`/products/${id}`),
   

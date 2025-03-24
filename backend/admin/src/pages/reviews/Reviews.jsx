@@ -62,7 +62,7 @@ export default function Reviews() {
           to="/reviews/new"
           className="btn btn-primary flex items-center"
         >
-          <PlusIcon className="h-5 w-5 mr-2" />
+          
           Создать отзыв
         </Link>
       </div>
@@ -104,7 +104,7 @@ export default function Reviews() {
                     <div className="text-sm font-medium text-gray-900">{review.title}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {renderRating(review.rating)}
+                    {review.rating}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">
@@ -122,13 +122,13 @@ export default function Reviews() {
                         to={`/reviews/${review.id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >
-                        <PencilIcon className="h-5 w-5" aria-hidden="true" />
+                        Редактировать
                       </Link>
                       <button
                         onClick={() => handleDelete(review.id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                        Удалить
                       </button>
                     </div>
                   </td>

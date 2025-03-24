@@ -84,7 +84,11 @@ class Review {
       
       const reviewResult = await client.query(reviewQuery, [title, description, rating, parent_id]);
       const review = reviewResult.rows[0];
-      
+      await client.query('COMMIT');
+
+      await client.query('BEGIN');
+      const Product = require('./product');
+      await Product.updateRating(parent_id);
       await client.query('COMMIT');
       
       return review;
@@ -98,20 +102,33 @@ class Review {
 
   static async update(id, reviewData) {
     const { title, description, rating, parent_id } = reviewData;
-    
-    const query = `
-      UPDATE reviews
-      SET title = $1, description = $2, rating = $3, 
-          parent_id = $4, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $5
-      RETURNING *;
-    `;
+    const client = await db.getClient();
     
     try {
-      const result = await db.query(query, [title, description, rating, parent_id, id]);
-      return result.rows[0];
+      await client.query('BEGIN');
+      
+      const query = `
+        UPDATE reviews
+        SET title = $1, description = $2, rating = $3, 
+            parent_id = $4, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $5
+        RETURNING *;
+      `;
+      
+      const result = await client.query(query, [title, description, rating, parent_id, id]);
+      const updatedReview = result.rows[0];
+      await client.query('COMMIT');
+
+      await client.query('BEGIN');
+      const Product = require('./product');
+      await Product.updateRating(parent_id);
+      await client.query('COMMIT');
+      return updatedReview;
     } catch (error) {
+      await client.query('ROLLBACK');
       throw error;
+    } finally {
+      client.release();
     }
   }
 
@@ -121,6 +138,11 @@ class Review {
     
     try {
       await client.query('BEGIN');
+      
+      // Получаем информацию об удаляемом отзыве для обновления рейтинга
+      const reviewInfoQuery = `SELECT parent_id FROM reviews WHERE id = $1`;
+      const reviewInfoResult = await client.query(reviewInfoQuery, [id]);
+      const reviewInfo = reviewInfoResult.rows[0];
       
       // Сначала удаляем связанные файлы
       await File.deleteByParent(id);
@@ -134,6 +156,11 @@ class Review {
       
       const reviewResult = await client.query(reviewQuery, [id]);
       const deletedReview = reviewResult.rows[0];
+      await client.query('COMMIT');
+      await client.query('BEGIN');
+      // Обновляем рейтинг продукта, если это был отзыв к продукту
+      const Product = require('./product');
+      await Product.updateRating(reviewInfo.parent_id);
       
       await client.query('COMMIT');
       

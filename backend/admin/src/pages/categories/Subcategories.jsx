@@ -58,7 +58,7 @@ export default function Subcategories() {
           to="/subcategories/new"
           className="btn btn-primary flex items-center"
         >
-          <PlusIcon className="h-5 w-5 mr-2" />
+          
           Создать подкатегорию
         </Link>
       </div>
@@ -112,13 +112,13 @@ export default function Subcategories() {
                         to={`/subcategories/${subcategory.id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >
-                        <PencilIcon className="h-5 w-5" aria-hidden="true" />
+                        Редактировать
                       </Link>
                       <button
                         onClick={() => handleDelete(subcategory.id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                        Удалить
                       </button>
                     </div>
                   </td>
