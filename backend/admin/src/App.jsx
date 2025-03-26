@@ -27,11 +27,17 @@ import ActiveUsers from './pages/users/ActiveUsers';
 import Orders from './pages/orders/Orders';
 import OrderDetails from './pages/orders/OrderDetails';
 
+// Импортируем тестовую страницу для cookie
+import TestCookie from './components/TestCookie';
+
 function App() {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        
+        {/* Тестовая страница для cookie */}
+        <Route path="/test-cookie" element={<TestCookie />} />
         
         {/* Категории */}
         <Route path="/categories" element={<Categories />} />

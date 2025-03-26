@@ -32,7 +32,6 @@ exports.register = async (req, res) => {
     res.cookie('sessionId', session.id, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 часа
-      sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production'
     });
     
@@ -73,29 +72,32 @@ exports.login = async (req, res) => {
     if (!user.id) {
       return res.status(401).json({ error: 'Неверный номер телефона или пароль' });
     }
-
-    console.log('user', user)
     
     // Создаем сессию
     const session = await User.createSession(user.id);
     
-    // Устанавливаем куки для сессии
+    // Устанавливаем куки для сессии с более долгим сроком действия
+    res.clearCookie('sessionId');
     res.cookie('sessionId', session.id, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 часа
+      httpOnly: false, // В режиме разработки отключаем httpOnly для доступа через js-cookie
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней вместо 24 часов
+      secure: false, // В режиме разработки отключаем secure
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production'
+      path: '/'
     });
     
-    // Отправляем информацию о пользователе
-    res.json({
+    console.log('Set-Cookie:', res.getHeader('Set-Cookie'));
+    
+    res.send({
       message: 'Вход выполнен успешно',
       user: {
         id: user.id,
         name: user.name,
         phone_number: user.phone_number,
-        birth_date: user.birth_date
-      }
+        birth_date: user.birth_date,
+        role: user.role
+      },
+      sessionId: session.id
     });
   } catch (error) {
     logger.error(error, 'Ошибка при входе пользователя');
@@ -113,8 +115,13 @@ exports.logout = async (req, res) => {
       // Удаляем сессию из базы данных
       await User.deleteSession(sessionId);
       
-      // Очищаем куки
-      res.clearCookie('sessionId');
+      // Очищаем куки с правильными опциями
+      res.clearCookie('sessionId', {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'lax',
+        path: '/'
+      });
     }
     
     res.json({ message: 'Выход выполнен успешно' });
@@ -197,5 +204,29 @@ exports.changePassword = async (req, res) => {
   } catch (error) {
     logger.error(error, 'Ошибка при изменении пароля');
     res.status(500).json({ error: 'Ошибка при изменении пароля' });
+  }
+};
+
+// Тестовый эндпоинт для установки cookie
+exports.testCookie = async (req, res) => {
+  try {
+    // Устанавливаем тестовую куку
+    res.cookie('testCookie', 'hello-world', {
+      maxAge: 900000, // 15 минут
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      path: '/'
+    });
+    
+    console.log('Set test cookie header:', res.getHeader('Set-Cookie'));
+    
+    res.json({ 
+      message: 'Тестовый cookie установлен',
+      cookieValue: 'hello-world'
+    });
+  } catch (error) {
+    console.error('Error setting test cookie:', error);
+    res.status(500).json({ error: 'Ошибка при установке тестового cookie' });
   }
 }; 

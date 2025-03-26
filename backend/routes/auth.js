@@ -5,7 +5,7 @@ const { authenticateUser } = require('../middleware/auth');
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Регистрация нового пользователя
  *     tags: [Аутентификация]
@@ -47,7 +47,7 @@ router.post('/register', authController.register);
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Вход пользователя
  *     tags: [Аутентификация]
@@ -81,7 +81,7 @@ router.post('/login', authController.login);
 
 /**
  * @swagger
- * /api/auth/logout:
+ * /auth/logout:
  *   post:
  *     summary: Выход пользователя
  *     tags: [Аутентификация]
@@ -95,7 +95,25 @@ router.post('/logout', authController.logout);
 
 /**
  * @swagger
- * /api/auth/me:
+ * /auth/current:
+ *   get:
+ *     summary: Получение информации о текущем пользователе
+ *     tags: [Аутентификация]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Информация о пользователе
+ *       401:
+ *         description: Пользователь не аутентифицирован
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+router.get('/current', authenticateUser, authController.getCurrentUser);
+
+/**
+ * @swagger
+ * /auth/me:
  *   get:
  *     summary: Получение информации о текущем пользователе
  *     tags: [Аутентификация]
@@ -113,7 +131,7 @@ router.get('/me', authenticateUser, authController.getCurrentUser);
 
 /**
  * @swagger
- * /api/auth/update:
+ * /auth/update:
  *   put:
  *     summary: Обновление информации пользователя
  *     tags: [Аутентификация]
@@ -145,7 +163,7 @@ router.put('/update', authenticateUser, authController.updateUser);
 
 /**
  * @swagger
- * /api/auth/change-password:
+ * /auth/change-password:
  *   post:
  *     summary: Изменение пароля пользователя
  *     tags: [Аутентификация]
@@ -176,5 +194,19 @@ router.put('/update', authenticateUser, authController.updateUser);
  *         description: Внутренняя ошибка сервера
  */
 router.post('/change-password', authenticateUser, authController.changePassword);
+
+/**
+ * @swagger
+ * /auth/test-cookie:
+ *   get:
+ *     summary: Тестовый эндпоинт для установки cookie
+ *     tags: [Аутентификация]
+ *     responses:
+ *       200:
+ *         description: Тестовый cookie установлен
+ *       500:
+ *         description: Ошибка при установке cookie
+ */
+router.get('/test-cookie', authController.testCookie);
 
 module.exports = router; 

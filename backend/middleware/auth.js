@@ -8,17 +8,28 @@ const authenticateUser = async (req, res, next) => {
     const sessionId = req.cookies.sessionId;
     
     if (!sessionId) {
-      return res.status(401).json({ error: 'Не авторизован' });
+      logger.info('Нет sessionId в cookies');
+      return res.status(401).json({ error: 'Не авторизован', details: 'Отсутствует sessionId' });
     }
+    
+    logger.info(`Получен sessionId: ${sessionId}`);
     
     // Получаем сессию из базы данных
     const session = await User.getSessionById(sessionId);
     
     if (!session) {
       // Очищаем куки, если сессия не найдена или истекла
-      res.clearCookie('sessionId');
+      logger.info(`Сессия не найдена для sessionId: ${sessionId}`);
+      res.clearCookie('sessionId', {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'lax',
+        path: '/'
+      });
       return res.status(401).json({ error: 'Сессия истекла. Пожалуйста, войдите снова.' });
     }
+    
+    logger.info(`Аутентифицирован пользователь: ${session.user_id}`);
     
     // Сохраняем информацию о пользователе в объекте запроса
     req.user = {
@@ -28,6 +39,9 @@ const authenticateUser = async (req, res, next) => {
       birth_date: session.birth_date,
       role: session.role
     };
+    
+    // Обновляем срок действия сессии при каждом запросе
+    await User.refreshSession(sessionId);
     
     // Отслеживаем активность пользователя
     await User.trackUserActivity(sessionId, session.user_id, {
@@ -54,6 +68,8 @@ const optionalAuthUser = async (req, res, next) => {
       const session = await User.getSessionById(sessionId);
       
       if (session) {
+        logger.info(`Опционально аутентифицирован пользователь: ${session.user_id}`);
+        
         // Сохраняем информацию о пользователе в объекте запроса
         req.user = {
           id: session.user_id,
@@ -63,11 +79,16 @@ const optionalAuthUser = async (req, res, next) => {
           role: session.role
         };
         
+        // Обновляем срок действия сессии при каждом запросе
+        await User.refreshSession(sessionId);
+        
         // Отслеживаем активность пользователя
         await User.trackUserActivity(sessionId, session.user_id, {
           ip: req.ip,
           userAgent: req.headers['user-agent']
         });
+      } else {
+        logger.info(`Сессия не найдена для sessionId: ${sessionId}`);
       }
     }
     

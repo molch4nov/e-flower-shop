@@ -9,7 +9,7 @@ router.use(authenticateUser);
 
 /**
  * @swagger
- * /api/user/holidays:
+ * /user/holidays:
  *   get:
  *     summary: Получение всех праздников пользователя
  *     tags: [Пользователь]
@@ -27,7 +27,7 @@ router.get('/holidays', holidayController.getHolidays);
 
 /**
  * @swagger
- * /api/user/holidays:
+ * /user/holidays:
  *   post:
  *     summary: Добавление нового праздника
  *     tags: [Пользователь]
@@ -64,7 +64,7 @@ router.post('/holidays', holidayController.addHoliday);
 
 /**
  * @swagger
- * /api/user/holidays/{id}:
+ * /user/holidays/{id}:
  *   put:
  *     summary: Обновление праздника
  *     tags: [Пользователь]
@@ -111,7 +111,7 @@ router.put('/holidays/:id', holidayController.updateHoliday);
 
 /**
  * @swagger
- * /api/user/holidays/{id}:
+ * /user/holidays/{id}:
  *   delete:
  *     summary: Удаление праздника
  *     tags: [Пользователь]
@@ -139,7 +139,7 @@ router.delete('/holidays/:id', holidayController.deleteHoliday);
 
 /**
  * @swagger
- * /api/user/addresses:
+ * /user/addresses:
  *   get:
  *     summary: Получение всех адресов пользователя
  *     tags: [Пользователь]
@@ -157,7 +157,7 @@ router.get('/addresses', addressController.getAddresses);
 
 /**
  * @swagger
- * /api/user/addresses:
+ * /user/addresses:
  *   post:
  *     summary: Добавление нового адреса
  *     tags: [Пользователь]
@@ -193,7 +193,7 @@ router.post('/addresses', addressController.addAddress);
 
 /**
  * @swagger
- * /api/user/addresses/{id}:
+ * /user/addresses/{id}:
  *   put:
  *     summary: Обновление адреса
  *     tags: [Пользователь]
@@ -239,7 +239,7 @@ router.put('/addresses/:id', addressController.updateAddress);
 
 /**
  * @swagger
- * /api/user/addresses/{id}:
+ * /user/addresses/{id}:
  *   delete:
  *     summary: Удаление адреса
  *     tags: [Пользователь]

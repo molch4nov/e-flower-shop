@@ -9,7 +9,7 @@ router.use(isAdmin);
 
 /**
  * @swagger
- * /api/admin/users:
+ * /admin/users:
  *   get:
  *     summary: Получение списка всех пользователей
  *     tags: [Администрирование]
@@ -42,7 +42,7 @@ router.get('/users', adminController.getAllUsers);
 
 /**
  * @swagger
- * /api/admin/users/{id}:
+ * /admin/users/{id}:
  *   get:
  *     summary: Получение информации о конкретном пользователе
  *     tags: [Администрирование]
@@ -72,7 +72,7 @@ router.get('/users/:id', adminController.getUserDetails);
 
 /**
  * @swagger
- * /api/admin/users/{id}/role:
+ * /admin/users/{id}/role:
  *   put:
  *     summary: Обновление роли пользователя
  *     tags: [Администрирование]
@@ -117,7 +117,7 @@ router.put('/users/:id/role', adminController.updateUserRole);
 
 /**
  * @swagger
- * /api/admin/active-users:
+ * /admin/active-users:
  *   get:
  *     summary: Получение списка активных пользователей
  *     tags: [Администрирование]
@@ -144,7 +144,7 @@ router.get('/active-users', adminController.getActiveUsers);
 
 /**
  * @swagger
- * /api/admin/dashboard:
+ * /admin/dashboard:
  *   get:
  *     summary: Получение статистики для панели администратора
  *     tags: [Администрирование]

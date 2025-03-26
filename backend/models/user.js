@@ -117,15 +117,12 @@ class User {
   static async authenticate(phoneNumber, password) {
     // Находим пользователя по номеру телефона
     const user = await this.getByPhoneNumber(phoneNumber);
-    console.log(user)
     if (!user) {
-
       return null; // Пользователь не найден
     }
     
     // Проверяем соответствие пароля
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
-    
     if (!passwordMatch) {
       return null; // Пароль неверный
     }
@@ -143,7 +140,6 @@ class User {
     
     // Получаем роль пользователя
     const user = await this.getById(userId);
-    console.log(user)
     const userRole = user ? user.role : 'user';
     
     const query = `
@@ -154,10 +150,8 @@ class User {
     
     const sessionId = uuidv4();
     
-    try {
-      console.log(userId, expiresAt, userRole)
+    try {   
       const result = await db.query(query, [sessionId, userId, expiresAt, userRole]);
-      console.log(result)
       return result.rows[0];
     } catch (error) {
       throw error;
@@ -423,6 +417,23 @@ class User {
     try {
       const user = await this.getById(userId);
       return user && user.role === 'admin';
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Обновление срока действия сессии
+  static async refreshSession(sessionId) {
+    const query = `
+      UPDATE sessions
+      SET expires_at = NOW() + INTERVAL '30 days'
+      WHERE id = $1
+      RETURNING id;
+    `;
+    
+    try {
+      const result = await db.query(query, [sessionId]);
+      return result.rows[0];
     } catch (error) {
       throw error;
     }

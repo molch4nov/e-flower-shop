@@ -8,7 +8,7 @@ router.use(authenticateUser);
 
 /**
  * @swagger
- * /api/cart:
+ * /cart:
  *   get:
  *     summary: Получение содержимого корзины пользователя
  *     tags: [Корзина]
@@ -26,7 +26,7 @@ router.get('/', cartController.getCart);
 
 /**
  * @swagger
- * /api/cart:
+ * /cart:
  *   post:
  *     summary: Добавление товара в корзину
  *     tags: [Корзина]
@@ -66,7 +66,7 @@ router.post('/', cartController.addToCart);
 
 /**
  * @swagger
- * /api/cart/{id}:
+ * /cart/{id}:
  *   put:
  *     summary: Обновление количества товара в корзине
  *     tags: [Корзина]
@@ -108,7 +108,7 @@ router.put('/:id', cartController.updateCartItem);
 
 /**
  * @swagger
- * /api/cart/{id}:
+ * /cart/{id}:
  *   delete:
  *     summary: Удаление товара из корзины
  *     tags: [Корзина]
@@ -136,7 +136,7 @@ router.delete('/:id', cartController.removeFromCart);
 
 /**
  * @swagger
- * /api/cart/clear:
+ * /cart/clear:
  *   delete:
  *     summary: Очистка корзины
  *     tags: [Корзина]

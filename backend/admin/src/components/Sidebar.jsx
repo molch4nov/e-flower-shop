@@ -68,6 +68,12 @@ const Sidebar = () => {
           <Link to="/active-users" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/active-users')} mt-2`}>
             Активность пользователей
           </Link>
+          
+          <div className="border-t border-gray-200 my-4"></div>
+          
+          <Link to="/test-cookie" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/test-cookie')} mt-2 text-blue-600`}>
+            Тест Cookie
+          </Link>
         </div>
       </nav>
     </div>

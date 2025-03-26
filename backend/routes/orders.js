@@ -8,7 +8,7 @@ router.use(authenticateUser);
 
 /**
  * @swagger
- * /api/orders:
+ * /orders:
  *   get:
  *     summary: Получение всех заказов пользователя
  *     tags: [Заказы]
@@ -26,7 +26,7 @@ router.get('/', orderController.getUserOrders);
 
 /**
  * @swagger
- * /api/orders:
+ * /orders:
  *   post:
  *     summary: Создание нового заказа
  *     tags: [Заказы]
@@ -67,7 +67,7 @@ router.post('/', orderController.createOrder);
 
 /**
  * @swagger
- * /api/orders/{id}:
+ * /orders/{id}:
  *   get:
  *     summary: Получение информации о заказе пользователя
  *     tags: [Заказы]
@@ -98,7 +98,7 @@ router.get('/:id', orderController.getUserOrder);
 // Маршруты для админа
 /**
  * @swagger
- * /api/orders/admin/all:
+ * /orders/admin/all:
  *   get:
  *     summary: Получение всех заказов (для администратора)
  *     tags: [Заказы]
@@ -131,7 +131,7 @@ router.get('/admin/all', isAdmin, orderController.getAllOrders);
 
 /**
  * @swagger
- * /api/orders/admin/{id}:
+ * /orders/admin/{id}:
  *   get:
  *     summary: Получение информации о заказе (для администратора)
  *     tags: [Заказы]
@@ -161,7 +161,7 @@ router.get('/admin/:id', isAdmin, orderController.getOrder);
 
 /**
  * @swagger
- * /api/orders/admin/{id}/status:
+ * /orders/admin/{id}/status:
  *   put:
  *     summary: Обновление статуса заказа (для администратора)
  *     tags: [Заказы]

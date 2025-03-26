@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import Sidebar from './Sidebar';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Layout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -15,31 +16,56 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Check if user is authenticated and is an admin
+  // Check for existing session on mount only, not on every route change
   useEffect(() => {
-    checkAuthentication();
-  }, [location.pathname]);
+    const savedUser = localStorage.getItem('adminUser');
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setAdminUser(userData);
+        setLoginModalOpen(false);
+      } catch (e) {
+        console.error('Error parsing saved user data', e);
+        localStorage.removeItem('adminUser');
+        checkAuthentication();
+      }
+    } else {
+      checkAuthentication();
+    }
+  }, []);
 
   const checkAuthentication = async () => {
     setLoading(true);
     try {
+      // Check if we have session ID in cookies
+      const sessionId = Cookies.get('sessionId');
+      console.log('Current sessionId in cookies:', sessionId);
+      
       const response = await axios.get('/api/auth/current', { withCredentials: true });
       
       if (response.data && response.data.user) {
         if (response.data.user.role === 'admin') {
+          console.log('User authenticated as admin');
           setAdminUser(response.data.user);
+          // Save user data to localStorage for persistence
+          localStorage.setItem('adminUser', JSON.stringify(response.data.user));
           setLoginModalOpen(false);
         } else {
           // User is authenticated but not an admin
+          console.log('User authenticated but not an admin');
+          localStorage.removeItem('adminUser');
           setLoginError('У вас нет прав администратора для доступа к этой странице');
           setLoginModalOpen(true);
         }
       } else {
         // User is not authenticated
+        console.log('User not authenticated');
+        localStorage.removeItem('adminUser');
         setLoginModalOpen(true);
       }
     } catch (error) {
       console.error('Authentication check failed:', error);
+      localStorage.removeItem('adminUser');
       setLoginModalOpen(true);
     } finally {
       setLoading(false);
@@ -59,18 +85,33 @@ const Layout = ({ children }) => {
         withCredentials: true
       });
 
+      console.log('Login response:', response.data);
+      console.log('Document cookies:', document.cookie);
+      
+      // Check for sessionId in response data and manually set it if needed
+      if (response.data.sessionId) {
+        console.log('Setting cookie manually:', response.data.sessionId);
+        Cookies.set('sessionId', response.data.sessionId, { path: '/' });
+      }
+      
+      console.log('Cookies after login:', Cookies.get());
+
       if (response.data && response.data.user) {
         if (response.data.user.role === 'admin') {
+          // Save user data to localStorage for persistence
+          localStorage.setItem('adminUser', JSON.stringify(response.data.user));
           setAdminUser(response.data.user);
           setLoginModalOpen(false);
           // Display success message
           alert('Вход выполнен успешно');
         } else {
+          localStorage.removeItem('adminUser');
           setLoginError('У вас нет прав администратора');
         }
       }
     } catch (error) {
       console.error('Login failed:', error);
+      localStorage.removeItem('adminUser');
       setLoginError('Ошибка входа. Проверьте учетные данные');
     } finally {
       setLoginLoading(false);
@@ -81,6 +122,8 @@ const Layout = ({ children }) => {
     try {
       await axios.post('/api/auth/logout', {}, { withCredentials: true });
       setAdminUser(null);
+      localStorage.removeItem('adminUser');
+      Cookies.remove('sessionId');
       setLoginModalOpen(true);
       alert('Выход выполнен успешно');
     } catch (error) {
@@ -96,6 +139,11 @@ const Layout = ({ children }) => {
         <span className="ml-3">Загрузка...</span>
       </div>
     );
+  }
+
+  // If we have admin user but login modal is open, close it
+  if (adminUser && loginModalOpen) {
+    setLoginModalOpen(false);
   }
 
   return (

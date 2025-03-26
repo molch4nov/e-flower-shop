@@ -20,8 +20,10 @@ app.use(helmet({
   contentSecurityPolicy: false // Отключаем CSP для простоты разработки
 })); // Безопасность
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*', // Используем значение из .env или разрешаем все
-  credentials: true // Разрешить отправку cookies
+  origin: true, // Allow requests from any origin in development
+  credentials: true, // Разрешить отправку cookies
+  exposedHeaders: ['Set-Cookie'], // Expose Set-Cookie header
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 app.use(express.json()); // Парсинг JSON
 app.use(express.urlencoded({ extended: true })); // Парсинг URL-encoded данных

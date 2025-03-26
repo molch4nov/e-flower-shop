@@ -70,7 +70,7 @@ setInterval(async () => {
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 // Маршруты
-app.use('/api', indexRoutes);
+app.use('/', indexRoutes);
 
 // Обработка ошибок
 app.use((err, req, res, next) => {
