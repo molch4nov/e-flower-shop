@@ -6,7 +6,16 @@ const reviewRoutes = require('./reviews');
 const fileRoutes = require('./files');
 const flowerRoutes = require('./flowers');
 const productRoutes = require('./products');
+const authRoutes = require('./auth');
+const userRoutes = require('./user');
+const cartRoutes = require('./cart');
+const orderRoutes = require('./orders');
 const path = require('path');
+const { optionalAuthUser } = require('../middleware/auth');
+
+// Применяем опциональную аутентификацию для всех маршрутов API
+// Это позволит использовать информацию о пользователе, если он авторизован
+router.use(optionalAuthUser);
 
 /**
  * @swagger
@@ -89,20 +98,17 @@ router.get('/test-db', async (req, res) => {
   }
 });
 
-// Подключение маршрутов категорий
-router.use('/categories', categoryRoutes);
-
-// Подключение маршрутов отзывов
-router.use('/reviews', reviewRoutes);
-
-// Подключение маршрутов файлов
-router.use('/files', fileRoutes);
-
-// Подключение маршрутов цветов
-router.use('/flowers', flowerRoutes);
-
-// Подключение маршрутов товаров
-router.use('/products', productRoutes);
+// Подключаем маршруты API
+router.use('/api/auth', require('./auth'));
+router.use('/api/users', require('./user'));
+router.use('/api/files', require('./files'));
+router.use('/api/flowers', require('./flowers'));
+router.use('/api/categories', require('./categories'));
+router.use('/api/products', require('./products'));
+router.use('/api/reviews', require('./reviews'));
+router.use('/api/cart', require('./cart'));
+router.use('/api/orders', require('./orders'));
+router.use('/api/admin', require('./admin'));
 
 // Обслуживание admin-панели
 router.use('/admin', express.static(path.join(__dirname, '../public/admin')));

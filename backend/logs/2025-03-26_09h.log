@@ -1,0 +1,56 @@
+{"level":30,"time":"2025-03-26T06:33:32.901Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:33:56.651Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:34:00.624Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:36:54.638Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:39:49.989Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:39:55.724Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:40:45.674Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:48:20.187Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:48:42.894Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:49:19.864Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T06:49:22.874Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:05:46.845Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:05:54.339Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:05:57.206Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:06:42.557Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:06:50.047Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:08:34.115Z","module":"database","msg":"Закрытие соединений с PostgreSQL..."}
+{"level":30,"time":"2025-03-26T07:08:34.115Z","module":"database","msg":"Соединения с PostgreSQL закрыты"}
+{"level":30,"time":"2025-03-26T07:08:38.226Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:09:46.896Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:12.281Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:17.694Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:22.258Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:28.503Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:32.038Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:33.985Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:40.497Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:42.203Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:14:54.328Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:15:13.277Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:16:43.828Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:16:46.445Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:16:48.295Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:16:51.584Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:17:13.475Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":50,"time":"2025-03-26T07:17:16.268Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:74:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":50,"time":"2025-03-26T07:17:32.307Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:74:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":30,"time":"2025-03-26T07:18:20.816Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:18:22.071Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:18:25.363Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":50,"time":"2025-03-26T07:18:32.338Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:73:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":30,"time":"2025-03-26T07:18:54.659Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:18:56.440Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:18:59.603Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":30,"time":"2025-03-26T07:19:02.450Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":50,"time":"2025-03-26T07:19:04.044Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:73:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":30,"time":"2025-03-26T07:19:21.755Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":50,"time":"2025-03-26T07:19:21.885Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:73:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":30,"time":"2025-03-26T07:19:35.246Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":50,"time":"2025-03-26T07:19:35.330Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:73:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":30,"time":"2025-03-26T07:19:38.096Z","module":"database","msg":"Закрытие соединений с PostgreSQL..."}
+{"level":30,"time":"2025-03-26T07:19:41.507Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":50,"time":"2025-03-26T07:19:42.946Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:73:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":30,"time":"2025-03-26T07:20:21.446Z","module":"database","msg":"Подключение к PostgreSQL успешно установлено"}
+{"level":50,"time":"2025-03-26T07:20:23.117Z","module":"auth-controller","err":{"type":"TypeError","message":"Cannot read properties of null (reading 'id')","stack":"TypeError: Cannot read properties of null (reading 'id')\n    at exports.login (C:\\Users\\vlad-\\Desktop\\GitHub\\e-flower-shop\\backend\\controllers\\auth.js:73:15)"},"msg":"Ошибка при входе пользователя"}
+{"level":30,"time":"2025-03-26T07:20:32.549Z","module":"database","msg":"Закрытие соединений с PostgreSQL..."}

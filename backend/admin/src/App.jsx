@@ -17,6 +17,16 @@ import FlowerForm from './pages/flowers/FlowerForm';
 import Products from './pages/products/Products';
 import ProductForm from './pages/products/ProductForm';
 
+// Импортируем новые страницы для управления пользователями
+import Users from './pages/users/Users';
+import UserDetails from './pages/users/UserDetails';
+import UserForm from './pages/users/UserForm';
+import ActiveUsers from './pages/users/ActiveUsers';
+
+// Импортируем страницы для управления заказами
+import Orders from './pages/orders/Orders';
+import OrderDetails from './pages/orders/OrderDetails';
+
 function App() {
   return (
     <Layout>
@@ -49,6 +59,17 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/products/new" element={<ProductForm />} />
         <Route path="/products/:id" element={<ProductForm />} />
+
+        {/* Пользователи */}
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/new" element={<UserForm />} />
+        <Route path="/users/:id" element={<UserDetails />} />
+        <Route path="/users/:id/edit" element={<UserForm />} />
+        <Route path="/active-users" element={<ActiveUsers />} />
+        
+        {/* Заказы */}
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/orders/:id" element={<OrderDetails />} />
 
         {/* Страница 404 */}
         <Route path="*" element={

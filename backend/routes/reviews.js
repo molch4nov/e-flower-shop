@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const reviewController = require('../controllers/reviewController');
+const { optionalAuthUser, authenticateUser } = require('../middleware/auth');
+
+// Применяем опциональную аутентификацию для всех маршрутов
+// Это позволит использовать информацию о пользователе, если он авторизован
+router.use(optionalAuthUser);
 
 /**
  * @swagger
@@ -36,6 +41,13 @@ const reviewController = require('../controllers/reviewController');
  *           type: string
  *           format: uuid
  *           description: ID родительской сущности
+ *         user_id:
+ *           type: string
+ *           format: uuid
+ *           description: ID пользователя, оставившего отзыв
+ *         user_name:
+ *           type: string
+ *           description: Имя пользователя, оставившего отзыв
  *         created_at:
  *           type: string
  *           format: date-time
@@ -146,18 +158,86 @@ router.get('/parent/:parent_id', reviewController.getReviewsByParent);
 
 /**
  * @swagger
+ * /reviews/user/{user_id}:
+ *   get:
+ *     summary: Получить отзывы пользователя
+ *     description: Возвращает все отзывы, созданные указанным пользователем
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: ID пользователя
+ *     responses:
+ *       200:
+ *         description: Список отзывов пользователя
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Ошибка сервера
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/user/:user_id', reviewController.getReviewsByUser);
+
+/**
+ * @swagger
+ * /reviews/my:
+ *   get:
+ *     summary: Получить отзывы текущего пользователя
+ *     description: Возвращает все отзывы, созданные текущим авторизованным пользователем
+ *     tags: [Reviews]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Список отзывов пользователя
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       401:
+ *         description: Пользователь не аутентифицирован
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Ошибка сервера
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/my', authenticateUser, reviewController.getReviewsByUser);
+
+/**
+ * @swagger
  * /reviews:
  *   post:
  *     summary: Создать новый отзыв
  *     description: Создает новый отзыв, прикрепленный к указанной сущности
  *     tags: [Reviews]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title, description, rating, parent_id, parent_type]
+ *             required: [title, description, rating, parent_id]
  *             properties:
  *               title:
  *                 type: string
@@ -174,9 +254,6 @@ router.get('/parent/:parent_id', reviewController.getReviewsByParent);
  *                 type: string
  *                 format: uuid
  *                 description: ID родительской сущности
- *               parent_type:
- *                 type: string
- *                 description: Тип родительской сущности (category, subcategory и т.д.)
  *     responses:
  *       201:
  *         description: Отзыв создан
@@ -190,6 +267,8 @@ router.get('/parent/:parent_id', reviewController.getReviewsByParent);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Пользователь не аутентифицирован (если требуется)
  *       500:
  *         description: Ошибка сервера
  *         content:
@@ -219,7 +298,7 @@ router.post('/', reviewController.createReview);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title, description, rating, parent_id, parent_type]
+ *             required: [title, description, rating, parent_id]
  *             properties:
  *               title:
  *                 type: string
@@ -249,6 +328,8 @@ router.post('/', reviewController.createReview);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Нет доступа для редактирования
  *       404:
  *         description: Отзыв не найден
  *         content:
@@ -269,7 +350,6 @@ router.put('/:id', reviewController.updateReview);
  * /reviews/{id}:
  *   delete:
  *     summary: Удалить отзыв
- *     description: Удаляет отзыв и все прикрепленные к нему файлы
  *     tags: [Reviews]
  *     parameters:
  *       - in: path
@@ -291,6 +371,8 @@ router.put('/:id', reviewController.updateReview);
  *                   type: string
  *                 review:
  *                   $ref: '#/components/schemas/Review'
+ *       403:
+ *         description: Нет доступа для удаления
  *       404:
  *         description: Отзыв не найден
  *         content:

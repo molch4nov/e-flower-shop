@@ -1,6 +1,6 @@
 const Review = require('../models/review');
 const File = require('../models/file');
-const logger = require('pino')({ name: 'review-controller' });
+const logger = require('../config/logger')('review-controller');
 
 exports.getAllReviews = async (req, res) => {
   try {
@@ -39,9 +39,23 @@ exports.getReviewsByParent = async (req, res) => {
   }
 };
 
+exports.getReviewsByUser = async (req, res) => {
+  try {
+    const userId = req.params.user_id || req.user.id;
+    const reviews = await Review.getByUser(userId);
+    res.json(reviews);
+  } catch (error) {
+    logger.error(error, 'Ошибка при получении отзывов пользователя');
+    res.status(500).json({ error: 'Ошибка при получении отзывов пользователя' });
+  }
+};
+
 exports.createReview = async (req, res) => {
   try {
     const { title, description, rating, parent_id } = req.body;
+
+    // Получаем ID пользователя из аутентификации
+    const user_id = req.user ? req.user.id : null;
 
     // Проверка обязательных полей
     if (!title || !description || !rating || !parent_id) {
@@ -61,6 +75,7 @@ exports.createReview = async (req, res) => {
       description,
       rating: ratingNum,
       parent_id,
+      user_id
     };
 
     const newReview = await Review.create(reviewData);
@@ -89,18 +104,28 @@ exports.updateReview = async (req, res) => {
       return res.status(400).json({ error: 'Рейтинг должен быть числом от 1 до 5' });
     }
 
+    // Получаем текущий отзыв для проверки владельца
+    const currentReview = await Review.getById(id);
+    
+    if (!currentReview) {
+      return res.status(404).json({ error: 'Отзыв не найден' });
+    }
+    
+    // Проверяем, что пользователь может редактировать отзыв
+    // Если пользователь аутентифицирован и не является владельцем отзыва
+    if (req.user && currentReview.user_id && req.user.id !== currentReview.user_id) {
+      return res.status(403).json({ error: 'У вас нет прав на редактирование этого отзыва' });
+    }
+
     const reviewData = {
       title,
       description,
       rating: ratingNum,
       parent_id,
+      user_id: currentReview.user_id // Сохраняем исходного владельца
     };
 
     const updatedReview = await Review.update(id, reviewData);
-
-    if (!updatedReview) {
-      return res.status(404).json({ error: 'Отзыв не найден' });
-    }
 
     // Получаем файлы для обновленного отзыва
     updatedReview.files = await File.getByParent(id);
@@ -115,11 +140,21 @@ exports.updateReview = async (req, res) => {
 exports.deleteReview = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedReview = await Review.delete(id);
 
-    if (!deletedReview) {
+    // Получаем текущий отзыв для проверки владельца
+    const currentReview = await Review.getById(id);
+    
+    if (!currentReview) {
       return res.status(404).json({ error: 'Отзыв не найден' });
     }
+    
+    // Проверяем, что пользователь может удалить отзыв
+    // Если пользователь аутентифицирован и не является владельцем отзыва
+    if (req.user && currentReview.user_id && req.user.id !== currentReview.user_id) {
+      return res.status(403).json({ error: 'У вас нет прав на удаление этого отзыва' });
+    }
+
+    const deletedReview = await Review.delete(id);
 
     res.json({
       message: 'Отзыв успешно удален',

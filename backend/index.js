@@ -18,18 +18,53 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Настройка доверия к прокси
-// app.set("trust proxy", true);
+app.set("trust proxy", 1);
+
+// // Получаем разрешенные источники из переменных окружения
+// const allowedOrigins = process.env.CORS_ORIGIN 
+//   ? process.env.CORS_ORIGIN.split(',') 
+//   : ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:5173'];
+
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:5173']
 
 // Middleware
 app.use(cors({
-  origin: '*' | process.env.CORS_ORIGIN, // Используем значение из .env или разрешаем все
-  credentials: true // Разрешить отправку cookies
+  origin: function(origin, callback) {
+    // Разрешаем запросы без origin (например, мобильные приложения)
+    if (!origin) return callback(null, true);
+    
+    // Проверяем, разрешен ли источник
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Не разрешено CORS'));
+    }
+  },
+  credentials: true, // Разрешить отправку cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 }));
+
 app.use(express.json()); // Парсинг JSON-запросов
 app.use(express.urlencoded({ extended: true })); // Парсинг URL-encoded запросов
 app.use(cookieParser()); // Парсинг cookies
-app.use(helmet()); // Безопасность заголовков
+app.use(helmet({
+  crossOriginResourcePolicy: false // Разрешаем загрузку ресурсов с других источников
+})); 
 app.use(rateLimiter); // Ограничение скорости запросов
+
+// Периодическая очистка истекших сессий
+const User = require('./models/user');
+setInterval(async () => {
+  try {
+    const deletedCount = await User.cleanExpiredSessions();
+    if (deletedCount > 0) {
+      logger.info(`Очищено ${deletedCount} истекших сессий`);
+    }
+  } catch (error) {
+    logger.error(error, 'Ошибка при очистке истекших сессий');
+  }
+}, 60 * 60 * 1000); // Запуск каждый час
 
 // Swagger документация
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));

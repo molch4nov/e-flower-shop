@@ -4,8 +4,10 @@ const File = require('./file');
 class Review {
   static async getAll() {
     const query = `
-      SELECT * FROM reviews
-      ORDER BY created_at DESC;
+      SELECT r.*, u.name AS user_name
+      FROM reviews r
+      LEFT JOIN users u ON r.user_id = u.id
+      ORDER BY r.created_at DESC;
     `;
     
     try {
@@ -25,8 +27,10 @@ class Review {
 
   static async getById(id) {
     const query = `
-      SELECT * FROM reviews
-      WHERE id = $1;
+      SELECT r.*, u.name AS user_name
+      FROM reviews r
+      LEFT JOIN users u ON r.user_id = u.id
+      WHERE r.id = $1;
     `;
     
     try {
@@ -46,9 +50,11 @@ class Review {
 
   static async getByParent(parentId) {
     const query = `
-      SELECT * FROM reviews
-      WHERE parent_id = $1
-      ORDER BY created_at DESC;
+      SELECT r.*, u.name AS user_name
+      FROM reviews r
+      LEFT JOIN users u ON r.user_id = u.id
+      WHERE r.parent_id = $1
+      ORDER BY r.created_at DESC;
     `;
     
     try {
@@ -66,8 +72,32 @@ class Review {
     }
   }
 
+  static async getByUser(userId) {
+    const query = `
+      SELECT r.*, u.name AS user_name
+      FROM reviews r
+      LEFT JOIN users u ON r.user_id = u.id
+      WHERE r.user_id = $1
+      ORDER BY r.created_at DESC;
+    `;
+    
+    try {
+      const result = await db.query(query, [userId]);
+      const reviews = result.rows;
+      
+      // Получение файлов для каждого отзыва
+      for (const review of reviews) {
+        review.files = await File.getByParent(review.id);
+      }
+      
+      return reviews;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async create(reviewData) {
-    const { title, description, rating, parent_id } = reviewData;
+    const { title, description, rating, parent_id, user_id } = reviewData;
     
     // Начинаем транзакцию
     const client = await db.getClient();
@@ -77,12 +107,12 @@ class Review {
       
       // Создаем отзыв
       const reviewQuery = `
-        INSERT INTO reviews (title, description, rating, parent_id)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO reviews (title, description, rating, parent_id, user_id)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *;
       `;
       
-      const reviewResult = await client.query(reviewQuery, [title, description, rating, parent_id]);
+      const reviewResult = await client.query(reviewQuery, [title, description, rating, parent_id, user_id]);
       const review = reviewResult.rows[0];
       await client.query('COMMIT');
 
@@ -101,7 +131,7 @@ class Review {
   }
 
   static async update(id, reviewData) {
-    const { title, description, rating, parent_id } = reviewData;
+    const { title, description, rating, parent_id, user_id } = reviewData;
     const client = await db.getClient();
     
     try {
@@ -110,12 +140,12 @@ class Review {
       const query = `
         UPDATE reviews
         SET title = $1, description = $2, rating = $3, 
-            parent_id = $4, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $5
+            parent_id = $4, user_id = $5, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $6
         RETURNING *;
       `;
       
-      const result = await client.query(query, [title, description, rating, parent_id, id]);
+      const result = await client.query(query, [title, description, rating, parent_id, user_id, id]);
       const updatedReview = result.rows[0];
       await client.query('COMMIT');
 

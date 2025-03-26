@@ -1,61 +1,77 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Squares2X2Icon, 
-  TagIcon, 
-  ChatBubbleLeftRightIcon, 
-  PhotoIcon,
-  FlowerIcon,
-  ShoppingBagIcon 
-} from '@heroicons/react/24/outline';
+import { Disclosure } from '@headlessui/react';
 
-const navigation = [
-  { name: 'Дашборд', href: '/', icon: Squares2X2Icon },
-  { name: 'Категории', href: '/categories', icon: TagIcon },
-  { name: 'Отзывы', href: '/reviews', icon: ChatBubbleLeftRightIcon },
-  { name: 'Файлы', href: '/files', icon: PhotoIcon },
-  { name: 'Цветы', href: '/flowers', icon: FlowerIcon },
-  { name: 'Товары', href: '/products', icon: ShoppingBagIcon },
-];
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
-
-export default function Sidebar() {
+const Sidebar = () => {
   const location = useLocation();
+  const currentPath = location.pathname;
+
+  const isActive = (path) => {
+    return currentPath === path ? 'bg-primary-700 text-white' : 'text-gray-700 hover:bg-gray-100';
+  };
 
   return (
-    <div className="flex flex-col h-full bg-primary-800 text-white w-64">
-      <div className="flex items-center justify-center h-16 px-4 border-b border-primary-700">
-        <h1 className="text-xl font-bold">Цветочный магазин</h1>
-      </div>
-      <nav className="flex-1 overflow-y-auto py-4 space-y-1">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={classNames(
-                isActive
-                  ? 'bg-primary-900 text-white'
-                  : 'text-primary-100 hover:bg-primary-700',
-                'group flex items-center px-4 py-2 text-sm font-medium'
-              )}
-            >
-              <item.icon
-                className={classNames(
-                  isActive ? 'text-white' : 'text-primary-300 group-hover:text-white',
-                  'mr-3 flex-shrink-0 h-6 w-6'
-                )}
-                aria-hidden="true"
-              />
-              {item.name}
-            </Link>
-          );
-        })}
+    <div className="h-full bg-white shadow-md">
+      <nav className="flex flex-col h-full">
+        <div className="p-4">
+          <Link to="/" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/')}`}>
+            Панель управления
+          </Link>
+
+          <Disclosure>
+            {({ open }) => (
+              <>
+                <Disclosure.Button className="w-full text-left px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 mt-2">
+                  <div className="flex justify-between items-center">
+                    <span>Каталог</span>
+                    <span>{open ? '▼' : '►'}</span>
+                  </div>
+                </Disclosure.Button>
+                <Disclosure.Panel className="pl-6">
+                  <Link to="/categories" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/categories')}`}>
+                    Категории
+                  </Link>
+                  <Link to="/subcategories" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/subcategories')}`}>
+                    Подкатегории
+                  </Link>
+                </Disclosure.Panel>
+              </>
+            )}
+          </Disclosure>
+
+          <Link to="/products" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/products')} mt-2`}>
+            Товары
+          </Link>
+          
+          <Link to="/flowers" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/flowers')} mt-2`}>
+            Цветы
+          </Link>
+          
+          <Link to="/orders" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/orders')} mt-2`}>
+            Заказы
+          </Link>
+
+          <Link to="/reviews" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/reviews')} mt-2`}>
+            Отзывы
+          </Link>
+
+          <Link to="/files" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/files')} mt-2`}>
+            Файлы
+          </Link>
+          
+          <div className="border-t border-gray-200 my-4"></div>
+          
+          <Link to="/users" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/users')} mt-2`}>
+            Пользователи
+          </Link>
+          
+          <Link to="/active-users" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/active-users')} mt-2`}>
+            Активность пользователей
+          </Link>
+        </div>
       </nav>
     </div>
   );
-} 
+};
+
+export default Sidebar; 
