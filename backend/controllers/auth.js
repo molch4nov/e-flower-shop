@@ -85,8 +85,7 @@ exports.login = async (req, res) => {
       sameSite: 'lax',
       path: '/'
     });
-    
-    console.log('Set-Cookie:', res.getHeader('Set-Cookie'));
+  
     
     res.send({
       message: 'Вход выполнен успешно',

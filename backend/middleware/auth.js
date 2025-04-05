@@ -4,6 +4,7 @@ const logger = require('../config/logger')('auth-middleware');
 // Middleware для проверки аутентификации
 const authenticateUser = async (req, res, next) => {
   try {
+    console.log('req.cookies', req.cookies)
     // Получаем ID сессии из куки
     const sessionId = req.cookies.sessionId;
     
@@ -16,6 +17,7 @@ const authenticateUser = async (req, res, next) => {
     
     // Получаем сессию из базы данных
     const session = await User.getSessionById(sessionId);
+    console.log('session', session)
     
     if (!session) {
       // Очищаем куки, если сессия не найдена или истекла
@@ -48,6 +50,7 @@ const authenticateUser = async (req, res, next) => {
       ip: req.ip,
       userAgent: req.headers['user-agent']
     });
+     console.log('THIS!')
     
     // Переходим к следующему middleware
     next();
@@ -110,6 +113,7 @@ const isAdmin = async (req, res, next) => {
     }
     
     // Проверяем, является ли пользователь администратором
+    console.log('req.user', req.user)
     if (req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Доступ запрещен, требуются права администратора' });
     }

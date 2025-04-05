@@ -4,7 +4,7 @@ const adminController = require('../controllers/admin');
 const { authenticateUser, isAdmin } = require('../middleware/auth');
 
 // Все маршруты требуют аутентификации и прав администратора
-router.use(authenticateUser);
+// router.use(authenticateUser);
 router.use(isAdmin);
 
 /**

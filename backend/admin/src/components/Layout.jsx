@@ -24,6 +24,7 @@ const Layout = ({ children }) => {
         const userData = JSON.parse(savedUser);
         setAdminUser(userData);
         setLoginModalOpen(false);
+        setLoading(false);
       } catch (e) {
         console.error('Error parsing saved user data', e);
         localStorage.removeItem('adminUser');
@@ -151,7 +152,7 @@ const Layout = ({ children }) => {
       <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
         <div className={`fixed inset-y-0 left-0 ${collapsed ? 'w-20' : 'w-64'} transition-all duration-300 ease-in-out z-10`}>
-          <div className="h-16 flex items-center justify-center bg-primary-600 text-white font-bold text-xl">
+          <div className="h-16 flex items-center justify-center bg-primary-600 text-black-600 font-bold text-xl">
             {collapsed ? 'ЦМ' : 'Цветочный Магазин'}
           </div>
           <Sidebar />
@@ -160,14 +161,14 @@ const Layout = ({ children }) => {
         {/* Main content */}
         <div className={`flex-1 flex flex-col ${collapsed ? 'ml-20' : 'ml-64'} transition-all duration-300 ease-in-out`}>
           {/* Header */}
-          <header className="bg-white shadow h-16 flex items-center justify-between px-4">
-            <button
+          <header className="bg-white shadow h-16 flex items-center justify-end px-4">
+            {/* <button
               onClick={() => setCollapsed(!collapsed)}
               className="text-gray-500 hover:text-gray-700 focus:outline-none"
             >
               {collapsed ? 'Развернуть меню' : 'Свернуть меню'}
             </button>
-            
+             */}
             {adminUser && (
               <div className="flex items-center">
                 <span className="mr-4">

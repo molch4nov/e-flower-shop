@@ -7,14 +7,16 @@ const Sidebar = () => {
   const currentPath = location.pathname;
 
   const isActive = (path) => {
-    return currentPath === path ? 'bg-primary-700 text-white' : 'text-gray-700 hover:bg-gray-100';
+    return currentPath === path ? 'bg-blue-400 text-black-900' : 'text-gray-700 hover:bg-gray-100';
   };
 
   return (
-    <div className="h-full bg-white shadow-md">
+    <div className="h-full bg-white shadow-md text-black-900" style={
+      {color: 'black !important'}
+    }>
       <nav className="flex flex-col h-full">
         <div className="p-4">
-          <Link to="/" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/')}`}>
+          <Link to="/" className={`block px-4 py-2  rounded-md text-sm font-medium ${isActive('/')}`}>
             Панель управления
           </Link>
 
@@ -39,7 +41,7 @@ const Sidebar = () => {
             )}
           </Disclosure>
 
-          <Link to="/products" className={`block px-4 py-2 rounded-md text-sm font-medium ${isActive('/products')} mt-2`}>
+          <Link to="/products" className={`block px-4 py-2 rounded-md text-sm text-black-900 font-medium ${isActive('/products')} mt-2`}>
             Товары
           </Link>
           

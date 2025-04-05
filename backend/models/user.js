@@ -346,15 +346,15 @@ class User {
     const query = `
       INSERT INTO active_users (session_id, user_id, ip_address, user_agent, last_activity)
       VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
-      ON CONFLICT (session_id) DO UPDATE
-      SET last_activity = CURRENT_TIMESTAMP
       RETURNING id, session_id, user_id, last_activity;
     `;
     
     try {
       const result = await db.query(query, [sessionId, userId, ip, userAgent]);
+      console.log('result', result)
       return result.rows[0];
     } catch (error) {
+      console.log('error', error)
       throw error;
     }
   }
