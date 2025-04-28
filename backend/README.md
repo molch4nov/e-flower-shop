@@ -26,3 +26,29 @@ Your app is ready to be deployed!
 ## Deployment
 
 Learn more about deploying your application with the [documentations](https://vite.dev/guide/static-deploy.html)
+
+## Запуск в Docker
+
+Для запуска проекта в Docker:
+
+1. Убедитесь, что у вас установлены Docker и Docker Compose
+2. Перейдите в директорию `backend`
+3. Выполните команду:
+
+```bash
+docker-compose up -d
+```
+
+Приложение будет доступно по адресу `http://localhost:3000`, API документация - `http://localhost:3000/api-docs`.
+
+### Остановка Docker контейнеров
+
+```bash
+docker-compose down
+```
+
+### Пересборка Docker контейнеров
+
+```bash
+docker-compose up -d --build
+```

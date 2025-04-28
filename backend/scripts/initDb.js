@@ -15,7 +15,32 @@ async function initDb() {
     port: process.env.POSTGRES_PORT,
   });
 
+  // Функция для попыток подключения
+  async function connectWithRetry(maxRetries = 5, delay = 5000) {
+    let retries = maxRetries;
+    
+    while (retries > 0) {
+      try {
+        const client = await pool.connect();
+        logger.info(`Успешное подключение к базе данных ${process.env.POSTGRES_DB} на ${process.env.POSTGRES_HOST}`);
+        client.release();
+        return true;
+      } catch (err) {
+        retries -= 1;
+        logger.warn(`Не удалось подключиться к базе данных. Осталось попыток: ${retries}`);
+        if (retries === 0) {
+          logger.error({ err }, 'Не удалось подключиться к базе данных после всех попыток');
+          throw err;
+        }
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
   try {
+    // Пытаемся подключиться к базе данных
+    await connectWithRetry();
+    
     // Чтение SQL файла
     const sqlFilePath = path.join(__dirname, '../db/init.sql');
     const sqlScript = fs.readFileSync(sqlFilePath, 'utf8');
@@ -27,16 +52,19 @@ async function initDb() {
     // Закрытие соединения с базой данных
     await pool.end();
     logger.info('Соединение с базой данных закрыто');
+    return true;
   } catch (error) {
     logger.error({ err: error }, 'Ошибка при инициализации базы данных');
     throw error;
   }
 }
 
-// Запуск инициализации базы данных
-initDb().catch(err => {
-  logger.fatal({ err }, 'Критическая ошибка при инициализации базы данных');
-  process.exit(1);
-});
+// Если файл запущен напрямую, выполняем инициализацию
+// if (require.main === module) {
+//   initDb().catch(err => {
+//     logger.fatal({ err }, 'Критическая ошибка при инициализации базы данных');
+//     process.exit(1);
+//   });
+// }
 
 module.exports = initDb; 

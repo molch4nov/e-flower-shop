@@ -1,28 +1,50 @@
-## Usage
+# Vite & HeroUI Template
+
+This is a template for creating applications using Vite and HeroUI (v2).
+
+[Try it on CodeSandbox](https://githubbox.com/frontio-ai/vite-template)
+
+## Technologies Used
+
+- [Vite](https://vitejs.dev/guide/)
+- [HeroUI](https://heroui.com)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Tailwind Variants](https://tailwind-variants.org)
+- [TypeScript](https://www.typescriptlang.org)
+- [Framer Motion](https://www.framer.com/motion)
+
+## How to Use
+
+To clone the project, run the following command:
 
 ```bash
-$ npm install # or pnpm install or yarn install
+git clone https://github.com/frontio-ai/vite-template.git
 ```
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+### Install dependencies
 
-## Available Scripts
+You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
 
-In the project directory, you can run:
+```bash
+npm install
+```
 
-### `npm run dev`
+### Run the development server
 
-Runs the app in the development mode.<br>
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+```bash
+npm run dev
+```
 
-### `npm run build`
+### Setup pnpm (optional)
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+```bash
+public-hoist-pattern[]=*@heroui/*
+```
 
-## Deployment
+After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
 
-Learn more about deploying your application with the [documentations](https://vite.dev/guide/static-deploy.html)
+## License
+
+Licensed under the [MIT license](https://github.com/frontio-ai/vite-template/blob/main/LICENSE).

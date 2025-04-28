@@ -10,15 +10,30 @@ const pool = new Pool({
   port: process.env.POSTGRES_PORT
 });
 
-// Проверка соединения (только для не-тестового окружения)
+// Проверка соединения с повторными попытками
 if (process.env.NODE_ENV !== 'test') {
-  pool.connect((err, client, release) => {
-    if (err) {
-      return logger.error({ err }, 'Ошибка подключения к PostgreSQL');
-    }
-    logger.info('Подключение к PostgreSQL успешно установлено');
-    release();
-  });
+  let retries = 5;
+  
+  const connectWithRetry = () => {
+    return pool.connect()
+      .then(client => {
+        logger.info('Подключение к PostgreSQL успешно установлено');
+        client.release();
+      })
+      .catch(err => {
+        logger.error({ err }, `Не удалось подключиться к PostgreSQL. Осталось попыток: ${retries}`);
+        
+        if (retries === 0) {
+          logger.fatal('Не удалось подключиться к PostgreSQL после всех попыток');
+          return;
+        }
+        
+        retries -= 1;
+        setTimeout(connectWithRetry, 5000); // Повторная попытка через 5 секунд
+      });
+  };
+  
+  connectWithRetry();
 }
 
 // Обработка завершения работы приложения
