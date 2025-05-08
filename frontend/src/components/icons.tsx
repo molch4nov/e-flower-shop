@@ -185,112 +185,10 @@ export const SearchIcon = (props: IconSvgProps) => (
   </svg>
 );
 
-export const ShoppingCartIcon = (props: any) => (
+export const MenuIcon = (props: IconSvgProps) => (
   <svg
     aria-hidden="true"
     fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
-    <circle cx="8" cy="21" r="1" />
-    <circle cx="19" cy="21" r="1" />
-    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-  </svg>
-);
-
-export const UserIcon = (props: any) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
-
-export const FlowerIcon = (props: any) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
-    <path d="M12 2a6 6 0 0 0 6 6c0 3.314-2.686 6-6 6s-6-2.686-6-6a6 6 0 0 0 6-6Z" />
-    <path d="M12 14v7" />
-    <path d="M9 17h6" />
-  </svg>
-);
-
-export const InstagramIcon = (props: any) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
-
-export const TelegramIcon = (props: any) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
-    <path d="M22 2L11 13" />
-    <path d="m22 2-7 20-4-9-9-4 20-7Z" />
-  </svg>
-);
-
-export const VKIcon = (props: any) => (
-  <svg
-    aria-hidden="true"
     focusable="false"
     height="1em"
     role="presentation"
@@ -299,27 +197,25 @@ export const VKIcon = (props: any) => (
     {...props}
   >
     <path
-      fill="currentColor"
-      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12zm8.464-4.37H9.17c-.283 0-.363.168-.363.354 0 .337.17.991.789 2.114 1.04 1.95 2.503 2.952 3.842 2.952.796 0 1.007-.171 1.007-.571v-1.315c0-.42.092-.508.4-.508.226 0 .613.114 1.517 1.008.868.88 1.01 1.275 1.499 1.275h1.293c.283 0 .425-.137.343-.407a4.09 4.09 0 0 0-.81-1.127c-.226-.267-.566-.552-.754-.74-.226-.226-.16-.325 0-.528.454-.651 1.301-1.42 1.433-1.807a.5.5 0 0 0-.43-.744h-1.294c-.263 0-.384.137-.47.325 0 0-.552 1.36-1.332 2.246-.252.254-.368.336-.504.336-.16 0-.198-.115-.198-.34V8.618c0-.305-.085-.441-.34-.441h-2.031c-.17 0-.29.127-.29.247 0 .283.425.35.47.964v1.457c0 .332-.047.389-.189.389-.368 0-1.26-1.371-1.79-2.942-.103-.305-.212-.433-.512-.433z"
+      d="M3 12H21"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
     />
-  </svg>
-);
-
-export const WhatsAppIcon = (props: any) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
-    <path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.101-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.174-.3-.019-.465.13-.615.136-.135.301-.345.451-.523.146-.181.194-.301.297-.496.1-.21.049-.375-.025-.524-.075-.15-.672-1.62-.922-2.206-.24-.584-.487-.51-.672-.51-.172-.015-.371-.015-.571-.015-.2 0-.523.074-.797.359-.273.3-1.045 1.02-1.045 2.475s1.07 2.865 1.219 3.075c.149.18 2.096 3.195 5.076 4.483.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.196-.571-.347m-5.498-11.707c-2.757 0-4.986 2.13-4.986 4.75 0 .83.214 1.647.633 2.374l-.66 2.412 2.49-.598c.73.396 1.543.605 2.372.605 2.762 0 5.006-2.131 5.006-4.75 0-2.621-2.236-4.767-5.005-4.767zm.02 7.497c-1.528 0-2.768-1.187-2.768-2.65 0-1.467 1.24-2.65 2.768-2.65s2.78 1.183 2.78 2.65c0 1.463-1.252 2.65-2.78 2.65z" />
+    <path
+      d="M3 6H21"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+    <path
+      d="M3 18H21"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
   </svg>
 );

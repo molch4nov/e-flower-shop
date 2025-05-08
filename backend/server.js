@@ -28,7 +28,7 @@ app.use(cors({
 app.use(express.json()); // Парсинг JSON
 app.use(express.urlencoded({ extended: true })); // Парсинг URL-encoded данных
 app.use(cookieParser()); // Парсинг cookies
-app.use(rateLimiter); // Ограничение скорости запросов
+// app.use(rateLimiter); // Ограничение скорости запросов
 
 // Логирование запросов
 app.use((req, res, next) => {

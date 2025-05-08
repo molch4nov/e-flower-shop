@@ -1,33 +1,62 @@
-import { Route, Routes } from "react-router-dom";
-import MainLayout from "@/layouts/MainLayout";
+import { Route, Routes, Navigate } from "react-router-dom";
+import AuthProvider from "./providers/AuthProvider";
+import PrivateRoute from "./components/PrivateRoute";
 
+// Публичные страницы
 import IndexPage from "@/pages/index";
-import CatalogPage from "@/pages/catalog";
-import BouquetsPage from "@/pages/bouquets";
-import ProductPage from "@/pages/product";
-import CartPage from "@/pages/cart";
-import ProfilePage from "@/pages/profile";
-import OrdersPage from "@/pages/orders";
-import AboutPage from "@/pages/about";
-import NotFoundPage from "@/pages/404";
-import LoginPage from "@/pages/login";
-import RegisterPage from "@/pages/register";
+
+// Страницы авторизации
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+
+// Приватные страницы
+import ProfilePage from "./pages/ProfilePage";
+import OrdersPage from "./pages/OrdersPage";
+import CartPage from "./pages/CartPage";
+import ProductCatalogPage from "./pages/ProductCatalogPage";
 
 function App() {
   return (
-    <Routes>
-      <Route element={<MainLayout><IndexPage /></MainLayout>} path="/" />
-      <Route element={<MainLayout><CatalogPage /></MainLayout>} path="/catalog" />
-      <Route element={<MainLayout><BouquetsPage /></MainLayout>} path="/bouquets" />
-      <Route element={<MainLayout><ProductPage /></MainLayout>} path="/product/:id" />
-      <Route element={<MainLayout><CartPage /></MainLayout>} path="/cart" />
-      <Route element={<MainLayout><ProfilePage /></MainLayout>} path="/profile" />
-      <Route element={<MainLayout><OrdersPage /></MainLayout>} path="/orders" />
-      <Route element={<MainLayout><AboutPage /></MainLayout>} path="/about" />
-      <Route element={<MainLayout><LoginPage /></MainLayout>} path="/login" />
-      <Route element={<MainLayout><RegisterPage /></MainLayout>} path="/register" />
-      <Route element={<MainLayout><NotFoundPage /></MainLayout>} path="*" />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        {/* Публичные маршруты */}
+        <Route path="/" element={<IndexPage />} />
+        <Route path="/catalog/:id" element={<ProductCatalogPage />} />
+        
+        {/* Страницы авторизации */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        
+        {/* Защищенные маршруты */}
+        <Route 
+          path="/profile" 
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/orders" 
+          element={
+            <PrivateRoute>
+              <OrdersPage />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/cart" 
+          element={
+            <PrivateRoute>
+              <CartPage />
+            </PrivateRoute>
+          } 
+        />
+        
+        {/* Перенаправление для неизвестных маршрутов */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

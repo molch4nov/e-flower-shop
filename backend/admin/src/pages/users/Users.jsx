@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu } from '@headlessui/react';
-import axios from 'axios';
 import { format } from 'date-fns';
+import api from '../../services/api';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -22,7 +22,7 @@ const Users = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/admin/users?page=${pagination.current}&limit=${pagination.pageSize}`);
+      const response = await api.get(`/admin/users?page=${pagination.current}&limit=${pagination.pageSize}`);
       setUsers(response.data.users);
       setPagination(prev => ({
         ...prev,

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
-import axios from 'axios';
 import { format, formatDistance, formatRelative, differenceInMinutes } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import api from '../../services/api';
 
 const ActiveUsers = () => {
   const [activeUsers, setActiveUsers] = useState([]);
@@ -13,7 +13,7 @@ const ActiveUsers = () => {
   const fetchActiveUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/admin/active-users?minutes=${timeRange}`);
+      const response = await api.get(`/admin/active-users?minutes=${timeRange}`);
       setActiveUsers(response.data.activeUsers || []);
     } catch (error) {
       console.error('Error fetching active users:', error);

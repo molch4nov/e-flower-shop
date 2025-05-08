@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios'; // Удаляем импорт axios
 import Cookies from 'js-cookie';
+import api from '../services/api'; // Импортируем api
 
 const TestCookie = () => {
   const [result, setResult] = useState('');
   
   const testCookie = async () => {
     try {
-      const response = await axios.get('/api/auth/test-cookie', { 
+      // const response = await axios.get('/api/auth/test-cookie', { // Заменяем axios на api и корректируем путь
+      const response = await api.get('/auth/test-cookie', { 
         withCredentials: true 
       });
       console.log('Test cookie response:', response.data);

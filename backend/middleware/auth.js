@@ -19,7 +19,7 @@ const authenticateUser = async (req, res, next) => {
     const session = await User.getSessionById(sessionId);
     console.log('session', session)
     
-    if (!session) {
+    if (!session.id) {
       // Очищаем куки, если сессия не найдена или истекла
       logger.info(`Сессия не найдена для sessionId: ${sessionId}`);
       res.clearCookie('sessionId', {

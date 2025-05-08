@@ -1,7 +1,5 @@
 import { SVGProps } from "react";
 
-export interface IconSvgProps extends SVGProps<SVGSVGElement> {
+export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
-  width?: number;
-  height?: number;
-}
+};

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import Sidebar from './Sidebar';
-import axios from 'axios';
 import Cookies from 'js-cookie';
+import api from '../services/api';
 
 const Layout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -42,7 +42,7 @@ const Layout = ({ children }) => {
       const sessionId = Cookies.get('sessionId');
       console.log('Current sessionId in cookies:', sessionId);
       
-      const response = await axios.get('/api/auth/current', { withCredentials: true });
+      const response = await api.get('/auth/current', { withCredentials: true });
       
       if (response.data && response.data.user) {
         if (response.data.user.role === 'admin') {
@@ -79,7 +79,7 @@ const Layout = ({ children }) => {
     setLoginError('');
     
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await api.post('/auth/login', {
         phone_number: credentials.username,
         password: credentials.password
       }, {
@@ -121,7 +121,7 @@ const Layout = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('/api/auth/logout', {}, { withCredentials: true });
+      await api.post('/auth/logout', {}, { withCredentials: true });
       setAdminUser(null);
       localStorage.removeItem('adminUser');
       Cookies.remove('sessionId');

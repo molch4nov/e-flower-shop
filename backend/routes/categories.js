@@ -285,12 +285,12 @@ router.get('/:categoryId/subcategories', subcategoryController.getSubcategoriesB
  *         application/json:
  *           schema:
  *             type: object
- *             required: [name, categoryId]
+ *             required: [name, category_id]
  *             properties:
  *               name:
  *                 type: string
  *                 description: Название подкатегории
- *               categoryId:
+ *               category_id:
  *                 type: string
  *                 format: uuid
  *                 description: ID родительской категории

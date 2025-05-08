@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
-import axios from 'axios';
 import { format, parseISO } from 'date-fns';
+import api from '../../services/api';
 
 const UserForm = () => {
   const { id } = useParams();
@@ -28,7 +28,7 @@ const UserForm = () => {
   const fetchUserData = async () => {
     setInitialLoading(true);
     try {
-      const response = await axios.get(`/api/admin/users/${id}`);
+      const response = await api.get(`/admin/users/${id}`);
       const userData = response.data.user;
       
       setFormData({
@@ -114,21 +114,21 @@ const UserForm = () => {
     try {
       if (isEdit) {
         // Update existing user
-        await axios.put(`/api/users/${id}`, {
+        await api.put(`/users/${id}`, {
           name: formData.name,
           birth_date: formData.birth_date
         });
         
         // Update role separately if needed
-        const userData = await axios.get(`/api/admin/users/${id}`);
+        const userData = await api.get(`/admin/users/${id}`);
         if (userData.data.user.role !== formData.role) {
-          await axios.put(`/api/admin/users/${id}/role`, { role: formData.role });
+          await api.put(`/admin/users/${id}/role`, { role: formData.role });
         }
         
         showSuccess('Пользователь успешно обновлен');
       } else {
         // Create new user
-        await axios.post('/api/auth/register', {
+        await api.post('/auth/register', {
           name: formData.name,
           phone_number: formData.phone_number,
           password: formData.password,

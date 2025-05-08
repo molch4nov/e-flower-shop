@@ -51,10 +51,14 @@ app.use(cookieParser()); // Парсинг cookies
 app.use(helmet({
   crossOriginResourcePolicy: false // Разрешаем загрузку ресурсов с других источников
 })); 
-app.use(rateLimiter); // Ограничение скорости запросов
+// app.use(rateLimiter); // Ограничение скорости запросов
 
 // Периодическая очистка истекших сессий
 const User = require('./models/user');
+// const applyMigration = require('./scripts/migrateAdmin');
+// const initDb = require('./scripts/initDb');
+// const migrateUsersAndAuth = require('./scripts/migrateUsersAndAuth');
+// const runAllScripts = require('./scripts/run_all');
 setInterval(async () => {
   try {
     const deletedCount = await User.cleanExpiredSessions();
@@ -83,6 +87,8 @@ app.use((err, req, res, next) => {
 
 // Запуск сервера
 app.listen(PORT, () => {
+  // runAllScripts();
+
   logger.info(`Сервер запущен на порту ${PORT}`);
   logger.info(`Документация Swagger доступна по адресу: http://localhost:${PORT}/api-docs`);
 }); 

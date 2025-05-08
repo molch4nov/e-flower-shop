@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
-import axios from 'axios';
 import { format } from 'date-fns';
+import api from '../../services/api';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -40,7 +40,7 @@ const Orders = () => {
     }
     
     try {
-      const response = await axios.get(url);
+      const response = await api.get(url);
       
       // Filter by search text if provided
       let filteredOrders = response.data.orders;
@@ -122,7 +122,7 @@ const Orders = () => {
   
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
-      await axios.put(`/api/orders/admin/${orderId}/status`, { status: newStatus });
+      await api.put(`/orders/admin/${orderId}/status`, { status: newStatus });
       showSuccess('Статус заказа обновлен');
       fetchOrders(); // Refresh the list
     } catch (error) {

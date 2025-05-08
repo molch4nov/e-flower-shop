@@ -48,4 +48,12 @@ async function applyMigration() {
   }
 }
 
-applyMigration();
+
+if (require.main === module) {
+  applyMigration().catch(err => {
+    logger.fatal({ err }, 'Критическая ошибка при инициализации базы данных');
+    process.exit(1);
+  });
+}
+
+module.exports = applyMigration;

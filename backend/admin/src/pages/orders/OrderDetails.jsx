@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { format } from 'date-fns';
+import api from '../../services/api';
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -17,7 +17,7 @@ const OrderDetails = () => {
   const fetchOrderDetails = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/orders/admin/${id}`);
+      const response = await api.get(`/orders/admin/${id}`);
       setOrder(response.data);
     } catch (error) {
       console.error('Error fetching order details:', error);
@@ -30,7 +30,7 @@ const OrderDetails = () => {
   const updateOrderStatus = async (newStatus) => {
     setStatusLoading(true);
     try {
-      await axios.put(`/api/orders/admin/${id}/status`, { status: newStatus });
+      await api.put(`/orders/admin/${id}/status`, { status: newStatus });
       showSuccess('Статус заказа успешно обновлен');
       fetchOrderDetails(); // Refresh data
     } catch (error) {

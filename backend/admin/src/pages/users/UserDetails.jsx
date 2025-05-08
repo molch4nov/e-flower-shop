@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Dialog, Tab } from '@headlessui/react';
-import axios from 'axios';
 import { format, formatDistance } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import api from '../../services/api';
 
 const UserDetails = () => {
   const { id } = useParams();
@@ -24,7 +24,7 @@ const UserDetails = () => {
   const fetchUserDetails = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/admin/users/${id}`);
+      const response = await api.get(`/admin/users/${id}`);
       setUser(response.data.user);
       setHolidays(response.data.holidays || []);
       setAddresses(response.data.addresses || []);
@@ -41,7 +41,7 @@ const UserDetails = () => {
   const handleRoleChange = async () => {
     setRoleLoading(true);
     try {
-      await axios.put(`/api/admin/users/${id}/role`, { role: roleValue });
+      await api.put(`/admin/users/${id}/role`, { role: roleValue });
       showSuccess('Роль пользователя успешно обновлена');
       fetchUserDetails();
       setRoleModalVisible(false);

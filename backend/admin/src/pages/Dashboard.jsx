@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios'; // Удаляем импорт axios
+import api from '../services/api'; // Импортируем api (путь относительный)
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -18,11 +19,13 @@ const Dashboard = () => {
     
     try {
       // Fetch admin dashboard stats
-      const statsResponse = await axios.get('/api/admin/dashboard');
+      // const statsResponse = await axios.get('/api/admin/dashboard'); // Заменяем axios на api и корректируем путь
+      const statsResponse = await api.get('/admin/dashboard');
       setStats(statsResponse.data);
       
       // Fetch recent orders
-      const ordersResponse = await axios.get('/api/orders/admin/all?limit=5');
+      // const ordersResponse = await axios.get('/api/orders/admin/all?limit=5'); // Заменяем axios на api и корректируем путь
+      const ordersResponse = await api.get('/orders/admin/all?limit=5');
       setRecentOrders(ordersResponse.data.orders || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);

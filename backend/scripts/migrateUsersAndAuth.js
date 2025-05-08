@@ -11,7 +11,7 @@ const pool = new Pool({
   port: process.env.POSTGRES_PORT
 });
 
-async function applyMigration() {
+async function migrateUsersAndAuth() {
   const client = await pool.connect();
   
   try {
@@ -48,4 +48,4 @@ async function applyMigration() {
 }
 
 // Запускаем миграцию
-applyMigration(); 
+module.exports = migrateUsersAndAuth(); 

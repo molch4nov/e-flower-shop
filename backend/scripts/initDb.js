@@ -60,11 +60,11 @@ async function initDb() {
 }
 
 // Если файл запущен напрямую, выполняем инициализацию
-// if (require.main === module) {
-//   initDb().catch(err => {
-//     logger.fatal({ err }, 'Критическая ошибка при инициализации базы данных');
-//     process.exit(1);
-//   });
-// }
+if (require.main === module) {
+  initDb().catch(err => {
+    logger.fatal({ err }, 'Критическая ошибка при инициализации базы данных');
+    process.exit(1);
+  });
+}
 
 module.exports = initDb; 
