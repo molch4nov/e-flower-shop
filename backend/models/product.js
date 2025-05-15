@@ -33,6 +33,11 @@ class Product {
   }
 
   static async getById(id) {
+    // Проверка на специальные значения
+    if (id === 'popular' || id === 'top-rated') {
+      throw new Error(`Невозможно получить товар по ID: '${id}' - используйте специальные методы getPopular или getTopRated`);
+    }
+    
     const query = `
       SELECT p.*, s.name as subcategory_name
       FROM products p
@@ -43,12 +48,13 @@ class Product {
     try {
       const result = await db.query(query, [id]);
       const product = result.rows[0];
+      console.log('product', product);
       
       if (product) {
-        // Получение файлов и отзывов
-        product.files = await File.getByParent(product.id, 'product');
-        product.reviews = await Review.getByParent(product.id, 'product');
-        
+        // Получение отзывов
+        product.reviews = await Review.getByParent(id, 'product');
+        // Получение файлов
+        product['files'] = await File.getByParent(id, 'product');
         // Для букетов получаем состав
         if (product.type === 'bouquet') {
           product.flowers = await this.getBouquetFlowers(product.id);
@@ -358,17 +364,17 @@ class Product {
     }
   }
 
-  static async getPopular(limit = 10) {
+  static async getPopular(limit = 10, offset = 0) {
     const query = `
       SELECT p.*, s.name as subcategory_name
       FROM products p
       JOIN subcategories s ON p.subcategory_id = s.id
       ORDER BY p.purchases_count DESC
-      LIMIT $1;
+      LIMIT $1 OFFSET $2;
     `;
     
     try {
-      const result = await db.query(query, [limit]);
+      const result = await db.query(query, [limit, offset]);
       const products = result.rows;
       
       // Получение файлов и отзывов для каждого товара
@@ -388,17 +394,17 @@ class Product {
     }
   }
 
-  static async getTopRated(limit = 10) {
+  static async getTopRated(limit = 10, offset = 0) {
     const query = `
       SELECT p.*, s.name as subcategory_name
       FROM products p
       JOIN subcategories s ON p.subcategory_id = s.id
       ORDER BY p.rating DESC
-      LIMIT $1;
+      LIMIT $1 OFFSET $2;
     `;
     
     try {
-      const result = await db.query(query, [limit]);
+      const result = await db.query(query, [limit, offset]);
       const products = result.rows;
       
       // Получение файлов и отзывов для каждого товара

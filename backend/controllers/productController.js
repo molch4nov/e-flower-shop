@@ -14,14 +14,39 @@ exports.getAllProducts = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.getById(id);
     
-    if (!product) {
-      return res.status(404).json({ error: 'Товар не найден' });
+    // Обработка специальных запросов
+    if (id === 'popular') {
+      const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+      const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+      const products = await Product.getPopular(limit, offset);
+      return res.status(200).json(products);
     }
     
-    res.json(product);
+    if (id === 'top-rated') {
+      const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+      const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+      const products = await Product.getTopRated(limit, offset);
+      return res.json(products);
+    }
+    
+    // Проверка на валидный UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Недопустимый ID товара. ID должен быть в формате UUID.' });
+    }
+    
+    // Стандартная обработка - получение товара по ID
+    if (id !== 'popular' && id !== 'top-rated') {
+      const product = await Product.getById(id);
+
+      if (!product) {
+        return res.status(404).json({ error: 'Товар не найден' });
+      }
+      return res.status(200).json(product);
+    }
   } catch (error) {
+    console.log(error, 'its error')
     logger.error(error, 'Ошибка при получении товара');
     res.status(500).json({ error: 'Ошибка при получении товара' });
   }
@@ -192,28 +217,6 @@ exports.deleteProduct = async (req, res) => {
   } catch (error) {
     logger.error(error, 'Ошибка при удалении товара');
     res.status(500).json({ error: 'Ошибка при удалении товара' });
-  }
-};
-
-exports.getPopularProducts = async (req, res) => {
-  try {
-    const limit = req.query.limit ? parseInt(req.query.limit) : 10;
-    const products = await Product.getPopular(limit);
-    res.json(products);
-  } catch (error) {
-    logger.error(error, 'Ошибка при получении популярных товаров');
-    res.status(500).json({ error: 'Ошибка при получении популярных товаров' });
-  }
-};
-
-exports.getTopRatedProducts = async (req, res) => {
-  try {
-    const limit = req.query.limit ? parseInt(req.query.limit) : 10;
-    const products = await Product.getTopRated(limit);
-    res.json(products);
-  } catch (error) {
-    logger.error(error, 'Ошибка при получении товаров с высоким рейтингом');
-    res.status(500).json({ error: 'Ошибка при получении товаров с высоким рейтингом' });
   }
 };
 

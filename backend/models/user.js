@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 class User {
   static async getById(id) {
     const query = `
-      SELECT id, name, phone_number, birth_date, role, created_at, updated_at 
+      SELECT id, name, phone_number, email, birth_date, role, created_at, updated_at 
       FROM users
       WHERE id = $1;
     `;
@@ -20,7 +20,7 @@ class User {
 
   static async getByPhoneNumber(phoneNumber) {
     const query = `
-      SELECT id, name, phone_number, password_hash, birth_date, role, created_at, updated_at 
+      SELECT id, name, phone_number, email, password_hash, birth_date, role, created_at, updated_at 
       FROM users
       WHERE phone_number = $1;
     `;
@@ -34,7 +34,7 @@ class User {
   }
 
   static async create(userData) {
-    const { name, phone_number, password, birth_date, role = 'user' } = userData;
+    const { name, phone_number, email, password, birth_date, role = 'user' } = userData;
     
     // Проверяем, существует ли пользователь с таким телефоном
     const existingUser = await this.getByPhoneNumber(phone_number);
@@ -47,13 +47,13 @@ class User {
     const passwordHash = await bcrypt.hash(password, saltRounds);
     
     const query = `
-      INSERT INTO users (name, phone_number, password_hash, birth_date, role)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, name, phone_number, birth_date, role, created_at, updated_at;
+      INSERT INTO users (name, phone_number, email, password_hash, birth_date, role)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id, name, phone_number, email, birth_date, role, created_at, updated_at;
     `;
     
     try {
-      const result = await db.query(query, [name, phone_number, passwordHash, birth_date, role]);
+      const result = await db.query(query, [name, phone_number, email, passwordHash, birth_date, role]);
       return result.rows[0];
     } catch (error) {
       throw error;
@@ -61,7 +61,7 @@ class User {
   }
 
   static async update(id, userData) {
-    const { name, birth_date, role } = userData;
+    const { name, email, birth_date, phone_number, role } = userData;
     
     let query;
     let params;
@@ -70,20 +70,20 @@ class User {
       // Если указана роль, обновляем ее
       query = `
         UPDATE users
-        SET name = $1, birth_date = $2, role = $3, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $4
-        RETURNING id, name, phone_number, birth_date, role, created_at, updated_at;
+        SET name = $1, email = $2, birth_date = $3, phone_number = $4, role = $5, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $6
+        RETURNING id, name, phone_number, email, birth_date, role, created_at, updated_at;
       `;
-      params = [name, birth_date, role, id];
+      params = [name, email, birth_date, phone_number, role, id];
     } else {
       // Без роли
       query = `
         UPDATE users
-        SET name = $1, birth_date = $2, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $3
-        RETURNING id, name, phone_number, birth_date, role, created_at, updated_at;
+        SET name = $1, email = $2, birth_date = $3, phone_number = $4, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $5
+        RETURNING id, name, phone_number, email, birth_date, role, created_at, updated_at;
       `;
-      params = [name, birth_date, id];
+      params = [name, email, birth_date, phone_number, id];
     }
     
     try {
@@ -208,7 +208,7 @@ class User {
   // Методы для управления праздниками пользователя
   static async getHolidays(userId) {
     const query = `
-      SELECT id, name, date, created_at, updated_at
+      SELECT id, user_id, name, date, notes, created_at, updated_at
       FROM user_holidays
       WHERE user_id = $1
       ORDER BY date;
@@ -222,50 +222,65 @@ class User {
     }
   }
 
-  static async addHoliday(userId, holidayData) {
-    const { name, date } = holidayData;
-    
+  static async getHolidayById(id, userId) {
     const query = `
-      INSERT INTO user_holidays (user_id, name, date)
-      VALUES ($1, $2, $3)
-      RETURNING id, name, date, created_at, updated_at;
+      SELECT id, user_id, name, date, notes, created_at, updated_at
+      FROM user_holidays
+      WHERE id = $1 AND user_id = $2;
     `;
     
     try {
-      const result = await db.query(query, [userId, name, date]);
+      const result = await db.query(query, [id, userId]);
       return result.rows[0];
     } catch (error) {
       throw error;
     }
   }
 
-  static async updateHoliday(id, holidayData) {
-    const { name, date } = holidayData;
+  static async addHoliday(userId, holidayData) {
+    const { name, date, notes } = holidayData;
+    
+    const query = `
+      INSERT INTO user_holidays (user_id, name, date, notes)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, user_id, name, date, notes, created_at, updated_at;
+    `;
+    
+    try {
+      const result = await db.query(query, [userId, name, date, notes]);
+      return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateHoliday(id, userId, holidayData) {
+    const { name, date, notes } = holidayData;
     
     const query = `
       UPDATE user_holidays
-      SET name = $1, date = $2, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $3
-      RETURNING id, name, date, created_at, updated_at;
+      SET name = $1, date = $2, notes = $3, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $4 AND user_id = $5
+      RETURNING id, user_id, name, date, notes, created_at, updated_at;
     `;
     
     try {
-      const result = await db.query(query, [name, date, id]);
+      const result = await db.query(query, [name, date, notes, id, userId]);
       return result.rows[0];
     } catch (error) {
       throw error;
     }
   }
 
-  static async deleteHoliday(id) {
+  static async deleteHoliday(id, userId) {
     const query = `
       DELETE FROM user_holidays
-      WHERE id = $1
+      WHERE id = $1 AND user_id = $2
       RETURNING id;
     `;
     
     try {
-      const result = await db.query(query, [id]);
+      const result = await db.query(query, [id, userId]);
       return result.rows[0];
     } catch (error) {
       throw error;
@@ -275,10 +290,10 @@ class User {
   // Методы для управления адресами пользователя
   static async getAddresses(userId) {
     const query = `
-      SELECT id, name, address, created_at, updated_at
+      SELECT id, user_id, title, street, house, apartment, entrance, floor, is_default, notes, created_at, updated_at
       FROM user_addresses
       WHERE user_id = $1
-      ORDER BY created_at;
+      ORDER BY is_default DESC, created_at DESC;
     `;
     
     try {
@@ -289,53 +304,140 @@ class User {
     }
   }
 
+  static async getAddressById(id, userId) {
+    const query = `
+      SELECT id, user_id, title, street, house, apartment, entrance, floor, is_default, notes, created_at, updated_at
+      FROM user_addresses
+      WHERE id = $1 AND user_id = $2;
+    `;
+    
+    try {
+      const result = await db.query(query, [id, userId]);
+      return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async addAddress(userId, addressData) {
-    const { name, address } = addressData;
-    
-    const query = `
-      INSERT INTO user_addresses (user_id, name, address)
-      VALUES ($1, $2, $3)
-      RETURNING id, name, address, created_at, updated_at;
-    `;
+    const { title, street, house, apartment, entrance, floor, is_default, notes } = addressData;
+    const client = await db.getClient();
     
     try {
-      const result = await db.query(query, [userId, name, address]);
+      await client.query('BEGIN');
+      
+      // Если текущий адрес устанавливается как основной, сбрасываем основной статус у других адресов
+      if (is_default) {
+        await client.query(`
+          UPDATE user_addresses
+          SET is_default = FALSE
+          WHERE user_id = $1 AND is_default = TRUE;
+        `, [userId]);
+      }
+      
+      const query = `
+        INSERT INTO user_addresses (user_id, title, street, house, apartment, entrance, floor, is_default, notes)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING id, user_id, title, street, house, apartment, entrance, floor, is_default, notes, created_at, updated_at;
+      `;
+      
+      const result = await client.query(query, [
+        userId, title, street, house, apartment, entrance, floor, is_default, notes
+      ]);
+      
+      await client.query('COMMIT');
       return result.rows[0];
     } catch (error) {
+      await client.query('ROLLBACK');
       throw error;
+    } finally {
+      client.release();
     }
   }
 
-  static async updateAddress(id, addressData) {
-    const { name, address } = addressData;
-    
-    const query = `
-      UPDATE user_addresses
-      SET name = $1, address = $2, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $3
-      RETURNING id, name, address, created_at, updated_at;
-    `;
+  static async updateAddress(id, userId, addressData) {
+    const { title, street, house, apartment, entrance, floor, is_default, notes } = addressData;
+    const client = await db.getClient();
     
     try {
-      const result = await db.query(query, [name, address, id]);
+      await client.query('BEGIN');
+      
+      // Если адрес устанавливается как основной, сбрасываем основной статус у других адресов
+      if (is_default) {
+        await client.query(`
+          UPDATE user_addresses
+          SET is_default = FALSE
+          WHERE user_id = $1 AND id != $2 AND is_default = TRUE;
+        `, [userId, id]);
+      }
+      
+      const query = `
+        UPDATE user_addresses
+        SET title = $1, street = $2, house = $3, apartment = $4, 
+            entrance = $5, floor = $6, is_default = $7, notes = $8, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $9 AND user_id = $10
+        RETURNING id, user_id, title, street, house, apartment, entrance, floor, is_default, notes, created_at, updated_at;
+      `;
+      
+      const result = await client.query(query, [
+        title, street, house, apartment, entrance, floor, is_default, notes, id, userId
+      ]);
+      
+      await client.query('COMMIT');
       return result.rows[0];
     } catch (error) {
+      await client.query('ROLLBACK');
       throw error;
+    } finally {
+      client.release();
     }
   }
 
-  static async deleteAddress(id) {
+  static async deleteAddress(id, userId) {
     const query = `
       DELETE FROM user_addresses
-      WHERE id = $1
+      WHERE id = $1 AND user_id = $2
       RETURNING id;
     `;
     
     try {
-      const result = await db.query(query, [id]);
+      const result = await db.query(query, [id, userId]);
       return result.rows[0];
     } catch (error) {
       throw error;
+    }
+  }
+
+  static async setAddressAsDefault(id, userId) {
+    const client = await db.getClient();
+    
+    try {
+      await client.query('BEGIN');
+      
+      // Сначала убираем флаг "по умолчанию" у всех адресов пользователя
+      await client.query(`
+        UPDATE user_addresses
+        SET is_default = FALSE
+        WHERE user_id = $1 AND is_default = TRUE;
+      `, [userId]);
+      
+      // Устанавливаем текущий адрес как "по умолчанию"
+      const query = `
+        UPDATE user_addresses
+        SET is_default = TRUE, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $1 AND user_id = $2
+        RETURNING id, user_id, title, street, house, apartment, entrance, floor, is_default, notes, created_at, updated_at;
+      `;
+      
+      const result = await client.query(query, [id, userId]);
+      
+      await client.query('COMMIT');
+      return result.rows[0];
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
   }
 
@@ -351,7 +453,6 @@ class User {
     
     try {
       const result = await db.query(query, [sessionId, userId, ip, userAgent]);
-      console.log('result', result)
       return result.rows[0];
     } catch (error) {
       console.log('error', error)
@@ -435,7 +536,9 @@ class User {
       const result = await db.query(query, [sessionId]);
       return result.rows[0];
     } catch (error) {
-      throw error;
+      console.error('Ошибка при обновлении сессии:', error);
+      // Игнорируем ошибку обновления сессии, чтобы не блокировать пользователя
+      return { id: sessionId };
     }
   }
 }

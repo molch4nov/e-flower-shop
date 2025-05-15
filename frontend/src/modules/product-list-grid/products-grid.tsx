@@ -17,7 +17,7 @@ const ProductsGrid = React.forwardRef<HTMLDivElement, ProductGridProps>(
       <div
         ref={ref}
         className={cn(
-          "grid w-full grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+          "grid w-full grid-cols-2 gap-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
           className,
         )}
         {...props}

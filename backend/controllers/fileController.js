@@ -40,6 +40,9 @@ exports.uploadFile = async (req, res) => {
       return res.status(400).json({ error: 'parent_id обязателен' });
     }
 
+    console.log('req.file', req.file);
+    console.log('req.body', req.body);
+
     const fileData = {
       filename: req.file.originalname,
       mimetype: req.file.mimetype,

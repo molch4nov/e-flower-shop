@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fileController = require('../controllers/fileController');
+const { authenticateUser } = require('../middleware/auth');
 
 /**
  * @swagger
@@ -55,7 +56,7 @@ const fileController = require('../controllers/fileController');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/', fileController.uploadMiddleware, fileController.uploadFile);
+router.post('/', authenticateUser, fileController.uploadMiddleware, fileController.uploadFile);
 
 /**
  * @swagger

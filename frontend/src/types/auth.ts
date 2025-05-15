@@ -2,6 +2,7 @@ export interface User {
   id: number;
   name: string;
   phone_number: string;
+  email?: string;
   birth_date: string | null;
   role: 'user' | 'admin';
 }
@@ -10,6 +11,7 @@ export interface Holiday {
   id: number;
   name: string;
   date: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }
@@ -17,10 +19,12 @@ export interface Holiday {
 export interface Address {
   id: number;
   title: string;
-  address: string;
+  street: string;
+  house: string;
+  apartment: string;
   entrance?: string;
   floor?: string;
-  apartment?: string;
+  is_default: boolean;
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -33,6 +37,7 @@ export interface LoginCredentials {
 
 export interface RegisterCredentials extends LoginCredentials {
   name: string;
+  email?: string;
   birth_date?: string;
 }
 

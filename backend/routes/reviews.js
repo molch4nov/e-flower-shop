@@ -276,7 +276,7 @@ router.get('/my', authenticateUser, reviewController.getReviewsByUser);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/', reviewController.createReview);
+router.post('/', authenticateUser, reviewController.createReview);
 
 /**
  * @swagger

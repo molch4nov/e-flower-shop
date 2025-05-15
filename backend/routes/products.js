@@ -108,42 +108,6 @@ router.get('/', productController.getAllProducts);
 
 /**
  * @swagger
- * /products/{id}:
- *   get:
- *     summary: Получить товар по ID
- *     tags: [Products]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *           format: uuid
- *         required: true
- *         description: ID товара
- *     responses:
- *       200:
- *         description: Данные товара
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Product'
- *       404:
- *         description: Товар не найден
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Ошибка сервера
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.get('/:id', productController.getProductById);
-
-/**
- * @swagger
  * /products/subcategory/{subcategoryId}:
  *   get:
  *     summary: Получить товары по подкатегории
@@ -173,68 +137,6 @@ router.get('/:id', productController.getProductById);
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/subcategory/:subcategoryId', productController.getProductsBySubcategory);
-
-/**
- * @swagger
- * /products/popular:
- *   get:
- *     summary: Получить популярные товары
- *     tags: [Products]
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Количество товаров
- *     responses:
- *       200:
- *         description: Список популярных товаров
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
- *       500:
- *         description: Ошибка сервера
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.get('/popular', productController.getPopularProducts);
-
-/**
- * @swagger
- * /products/top-rated:
- *   get:
- *     summary: Получить товары с высоким рейтингом
- *     tags: [Products]
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Количество товаров
- *     responses:
- *       200:
- *         description: Список товаров с высоким рейтингом
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
- *       500:
- *         description: Ошибка сервера
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.get('/top-rated', productController.getTopRatedProducts);
 
 /**
  * @swagger
@@ -349,6 +251,51 @@ router.post('/normal', productController.createNormalProduct);
  *               $ref: '#/components/schemas/Error'
  */
 router.post('/bouquet', productController.createBouquet);
+
+/**
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: Получить товар по ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID товара или специальное значение ('popular', 'top-rated')
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Количество товаров (для popular и top-rated)
+ *     responses:
+ *       200:
+ *         description: Данные товара или список товаров
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/Product'
+ *                 - type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Товар не найден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Ошибка сервера
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/:id', productController.getProductById);
 
 /**
  * @swagger

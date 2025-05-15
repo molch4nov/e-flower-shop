@@ -57,6 +57,7 @@ class File {
       const result = await db.query(query, [filename, mimetype, file, parent_id]);
       return result.rows[0];
     } catch (error) {
+      console.log('FILE ERROR', error)
       throw error;
     }
   }

@@ -9,6 +9,19 @@ const { swaggerUi, specs } = require('./config/swagger');
 const cookieParser = require('cookie-parser');
 const rateLimiter = require('./middleware/rateLimiter');
 
+// Импортируем маршруты
+const authRoutes = require('./routes/auth');
+const cartRoutes = require('./routes/cart');
+const categoryRoutes = require('./routes/category');
+const subcategoryRoutes = require('./routes/subcategory');
+const productRoutes = require('./routes/product');
+const flowerRoutes = require('./routes/flower');
+const fileRoutes = require('./routes/file');
+const orderRoutes = require('./routes/orders');
+const reviewRoutes = require('./routes/review');
+const userRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,13 +30,28 @@ app.set("trust proxy", true);
 
 // Middleware
 app.use(helmet({
-  contentSecurityPolicy: false // Отключаем CSP для простоты разработки
+  contentSecurityPolicy: false, // Отключаем CSP для простоты разработки
+  crossOriginResourcePolicy: false, // Разрешаем загрузку ресурсов с других источников
+  crossOriginEmbedderPolicy: false // Разрешаем встраивание ресурсов
 })); // Безопасность
 app.use(cors({
-  origin: true, // Allow requests from any origin in development
+  origin: function(origin, callback) {
+    // Разрешаем запросы без origin (например, мобильные приложения)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:5173', 'http://localhost:5174'];
+    
+    // Проверяем, разрешен ли источник
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Не разрешено CORS'));
+    }
+  },
   credentials: true, // Разрешить отправку cookies
-  exposedHeaders: ['Set-Cookie'], // Expose Set-Cookie header
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie']
 }));
 app.use(express.json()); // Парсинг JSON
 app.use(express.urlencoded({ extended: true })); // Парсинг URL-encoded данных
@@ -59,6 +87,19 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true })
 
 // API маршруты
 app.use('/api', routes);
+
+// Регистрируем маршруты
+app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/subcategories', subcategoryRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/flowers', flowerRoutes);
+app.use('/api/files', fileRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Статические файлы для фронтенда
 app.use(express.static(path.join(__dirname, '../frontend')));

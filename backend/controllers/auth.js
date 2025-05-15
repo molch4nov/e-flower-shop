@@ -76,18 +76,22 @@ exports.login = async (req, res) => {
     // Создаем сессию
     const session = await User.createSession(user.id);
     
-    // Устанавливаем куки для сессии с более долгим сроком действия
+    // Устанавливаем куки для сессии
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     res.clearCookie('sessionId');
     res.cookie('sessionId', session.id, {
-      httpOnly: false, // В режиме разработки отключаем httpOnly для доступа через js-cookie
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней вместо 24 часов
-      secure: false, // В режиме разработки отключаем secure
-      sameSite: 'lax',
-      path: '/'
+      httpOnly: isProduction, // В production включаем httpOnly
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+      secure: isProduction, // В production включаем secure
+      sameSite: isProduction ? 'strict' : 'lax',
+      path: '/',
+      domain: isProduction ? process.env.COOKIE_DOMAIN : undefined
     });
-  
     
-    res.send({
+    logger.info(`Успешный вход пользователя: ${user.id}`);
+    
+    res.json({
       message: 'Вход выполнен успешно',
       user: {
         id: user.id,
@@ -114,15 +118,19 @@ exports.logout = async (req, res) => {
       // Удаляем сессию из базы данных
       await User.deleteSession(sessionId);
       
+      const isProduction = process.env.NODE_ENV === 'production';
+      
       // Очищаем куки с правильными опциями
       res.clearCookie('sessionId', {
-        httpOnly: false,
-        secure: false,
-        sameSite: 'lax',
-        path: '/'
+        httpOnly: isProduction,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        path: '/',
+        domain: isProduction ? process.env.COOKIE_DOMAIN : undefined
       });
     }
     
+    logger.info('Успешный выход пользователя');
     res.json({ message: 'Выход выполнен успешно' });
   } catch (error) {
     logger.error(error, 'Ошибка при выходе пользователя');

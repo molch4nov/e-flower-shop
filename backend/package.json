@@ -10,6 +10,8 @@
     "init-db": "node scripts/initDb.js",
     "migrate-users": "node scripts/migrateUsersAndAuth.js",
     "migrate-admin": "node scripts/migrateAdmin.js",
+    "migrate-holidays": "node scripts/migrateHolidays.js",
+    "migrate-addresses": "node scripts/migrateAddresses.js",
     "init-admin": "node scripts/initAdminPanel.js",
     "build-admin": "node scripts/buildAdmin.js",
     "build": "npm ci --production && npm run init-db",

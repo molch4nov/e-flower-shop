@@ -1,11 +1,13 @@
 const db = require('../config/db');
 const Cart = require('./cart');
+const Product = require('./product');
 
 class Order {
   static async getAll(userId) {
     const query = `
-      SELECT id, user_id, total_price, delivery_address, 
-             delivery_date, delivery_time, status, created_at, updated_at
+      SELECT id, user_id, order_number, total_price as total_amount, delivery_address, 
+             delivery_date, delivery_time, status, payment_method, payment_status,
+             notes, created_at, updated_at
       FROM orders
       WHERE user_id = $1
       ORDER BY created_at DESC;
@@ -28,8 +30,9 @@ class Order {
 
   static async getById(id, userId = null) {
     let query = `
-      SELECT id, user_id, total_price, delivery_address, 
-             delivery_date, delivery_time, status, created_at, updated_at
+      SELECT id, user_id, order_number, total_price as total_amount, delivery_address, 
+             delivery_date, delivery_time, status, payment_method, payment_status,
+             notes, created_at, updated_at
       FROM orders
       WHERE id = $1
     `;
@@ -59,7 +62,11 @@ class Order {
   static async getOrderItems(orderId) {
     const query = `
       SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price,
-             p.name AS product_name, p.type AS product_type
+             p.name AS product_name, p.type AS product_type,
+             COALESCE(
+               (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY position LIMIT 1),
+               '/images/default-product.jpg'
+             ) AS image_url
       FROM order_items oi
       JOIN products p ON oi.product_id = p.id
       WHERE oi.order_id = $1;
@@ -74,7 +81,7 @@ class Order {
   }
 
   static async create(userId, orderData) {
-    const { delivery_address, delivery_date, delivery_time } = orderData;
+    const { delivery_address, delivery_date, delivery_time, payment_method, notes } = orderData;
     const client = await db.getClient();
     
     try {
@@ -89,15 +96,26 @@ class Order {
       // Рассчитываем общую стоимость заказа
       const total = await Cart.getCartTotal(userId);
       
+      // Генерируем номер заказа (текущая дата + случайное число)
+      const orderNumber = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
       // Создаем заказ
       const orderQuery = `
-        INSERT INTO orders (user_id, total_price, delivery_address, delivery_date, delivery_time, status)
-        VALUES ($1, $2, $3, $4, $5, 'new')
-        RETURNING id, user_id, total_price, delivery_address, delivery_date, delivery_time, status, created_at, updated_at;
+        INSERT INTO orders (
+          user_id, order_number, total_price, delivery_address, 
+          delivery_date, delivery_time, status, payment_method, 
+          payment_status, notes
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, 'pending', $8)
+        RETURNING id, user_id, order_number, total_price as total_amount, 
+                  delivery_address, delivery_date, delivery_time, 
+                  status, payment_method, payment_status, notes, 
+                  created_at, updated_at;
       `;
       
       const orderResult = await client.query(orderQuery, [
-        userId, total, delivery_address, delivery_date, delivery_time
+        userId, orderNumber, total, delivery_address, delivery_date, 
+        delivery_time, payment_method, notes
       ]);
       const order = orderResult.rows[0];
       
@@ -140,16 +158,62 @@ class Order {
     }
   }
 
-  static async updateStatus(id, status) {
-    const query = `
+  static async updateStatus(id, status, userId = null) {
+    let query = `
       UPDATE orders
       SET status = $1, updated_at = CURRENT_TIMESTAMP
       WHERE id = $2
-      RETURNING id, user_id, total_price, delivery_address, delivery_date, delivery_time, status, created_at, updated_at;
+    `;
+    
+    // Если указан userId, то проверяем, что заказ принадлежит пользователю
+    if (userId) {
+      query += ` AND user_id = $3`;
+    }
+    
+    query += `
+      RETURNING id, user_id, order_number, total_price as total_amount, 
+                delivery_address, delivery_date, delivery_time, status, 
+                payment_method, payment_status, notes, created_at, updated_at;
     `;
     
     try {
-      const result = await db.query(query, [status, id]);
+      const result = userId
+        ? await db.query(query, [status, id, userId])
+        : await db.query(query, [status, id]);
+      
+      return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async cancelOrder(id, userId) {
+    return this.updateStatus(id, 'cancelled', userId);
+  }
+
+  static async updatePaymentStatus(id, paymentStatus, userId = null) {
+    let query = `
+      UPDATE orders
+      SET payment_status = $1, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2
+    `;
+    
+    // Если указан userId, то проверяем, что заказ принадлежит пользователю
+    if (userId) {
+      query += ` AND user_id = $3`;
+    }
+    
+    query += `
+      RETURNING id, user_id, order_number, total_price as total_amount, 
+                delivery_address, delivery_date, delivery_time, status, 
+                payment_method, payment_status, notes, created_at, updated_at;
+    `;
+    
+    try {
+      const result = userId
+        ? await db.query(query, [paymentStatus, id, userId])
+        : await db.query(query, [paymentStatus, id]);
+      
       return result.rows[0];
     } catch (error) {
       throw error;
@@ -160,8 +224,9 @@ class Order {
     const offset = (page - 1) * limit;
     
     const query = `
-      SELECT o.id, o.user_id, o.total_price, o.delivery_address, 
-             o.delivery_date, o.delivery_time, o.status, o.created_at, o.updated_at,
+      SELECT o.id, o.user_id, o.order_number, o.total_price, o.delivery_address, 
+             o.delivery_date, o.delivery_time, o.status, o.payment_method,
+             o.payment_status, o.notes, o.created_at, o.updated_at,
              u.name AS user_name, u.phone_number
       FROM orders o
       JOIN users u ON o.user_id = u.id

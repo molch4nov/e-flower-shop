@@ -9,9 +9,7 @@ import {
   RegisterCredentials, 
   User 
 } from "../types/auth";
-
-// API base URL
-const API_URL = "http://localhost:3000/api";
+import api from "../config/api";
 
 // Создаем контекст авторизации с типизацией
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -113,6 +111,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [error, setError] = useState<AuthError | null>(null);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   // Функция для очистки ошибок
   const clearError = () => setError(null);
@@ -123,23 +122,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsLoading(true);
       clearError();
 
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-        credentials: "include", // Важно для получения куки
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Ошибка при входе");
-      }
+      const data = await api.post('/auth/login', credentials);
 
       setUser(data.user);
       setIsAuthenticated(true);
+      
+      // Сохраняем sessionId в состоянии
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
+        localStorage.setItem('sessionId', data.sessionId);
+      }
       
       // Получаем дополнительные данные пользователя
       await getCurrentUser();
@@ -158,23 +150,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsLoading(true);
       clearError();
 
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-        credentials: "include", // Важно для получения куки
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Ошибка при регистрации");
-      }
+      const data = await api.post('/auth/register', credentials);
 
       setUser(data.user);
       setIsAuthenticated(true);
+      
+      // Сохраняем sessionId в состоянии, если он пришел в ответе
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
+        localStorage.setItem('sessionId', data.sessionId);
+      }
       
       // Получаем дополнительные данные пользователя
       await getCurrentUser();
@@ -192,16 +177,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setIsLoading(true);
 
-      await fetch(`${API_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await api.post('/auth/logout');
 
       // Очищаем данные пользователя даже если запрос не удался
       setUser(null);
       setIsAuthenticated(false);
+      setSessionId(null);
       setHolidays([]);
       setAddresses([]);
+      localStorage.removeItem('sessionId');
     } catch (err) {
       console.error("Ошибка при выходе:", err);
     } finally {
@@ -213,99 +197,87 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const getCurrentUser = async (): Promise<void> => {
     try {
       setIsLoading(true);
+      
+      // Получаем sessionId из localStorage, если он там есть
+      const storedSessionId = localStorage.getItem('sessionId');
+      if (storedSessionId && !sessionId) {
+        setSessionId(storedSessionId);
+      }
 
-      const response = await fetch(`${API_URL}/auth/me`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Важно для получения куки
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 401) {
+      try {
+        const data = await api.get('/auth/me');
+        
+        if (data && data.user) {
+          setUser(data.user);
+          setIsAuthenticated(true);
+          
+          // Обновляем дополнительные данные
+          if (data.holidays) setHolidays(data.holidays);
+          if (data.addresses) setAddresses(data.addresses);
+        }
+      } catch (err: any) {
+        if (err.status === 401) {
           // Не авторизован - очищаем данные
           setUser(null);
           setIsAuthenticated(false);
+          setSessionId(null);
           setHolidays([]);
           setAddresses([]);
+          localStorage.removeItem('sessionId');
           return;
         }
         
-        if (data.error) {
-          console.error("Ошибка API:", data.error);
-          throw new Error(data.error);
-        }
-        
-        throw new Error("Ошибка при получении данных пользователя");
+        // Другие ошибки - пробрасываем дальше
+        throw err;
       }
-
-      // Проверка структуры ответа
-      if (!data.user) {
-        console.error("Некорректный формат ответа:", data);
-        throw new Error("Ответ сервера не содержит данных пользователя");
-      }
-      
-      setUser(data.user);
-      setHolidays(data.holidays || []);
-      setAddresses(data.addresses || []);
-      setIsAuthenticated(true);
     } catch (err) {
-      console.error("Ошибка при получении данных пользователя:", err);
-      
-      // Добавляем подробное логирование ошибки
-      if (err instanceof Error) {
-        const authError = handleApiError(err, "Ошибка при получении данных пользователя");
-        setError(authError);
-      }
-      
+      const authError = handleApiError(err, "Ошибка при получении данных пользователя");
+      setError(authError);
       setUser(null);
       setIsAuthenticated(false);
+      setSessionId(null);
       setHolidays([]);
       setAddresses([]);
+      localStorage.removeItem('sessionId');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Проверяем авторизацию при загрузке приложения
+  // Проверяем авторизацию при загрузке
   useEffect(() => {
     getCurrentUser();
   }, []);
 
-  // Создаем значение контекста
-  const contextValue: AuthContextType = {
-    user,
-    isAuthenticated,
-    isLoading,
-    error,
-    holidays,
-    addresses,
-    login,
-    register,
-    logout,
-    getCurrentUser,
-    clearError,
-  };
-
+  // Предоставляем контекст авторизации
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoading,
+        error,
+        clearError,
+        login,
+        register,
+        logout,
+        holidays,
+        addresses,
+        getCurrentUser
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthProvider;
-
 // Хук для использования контекста авторизации
 export const useAuth = (): AuthContextType => {
-  const context = useContext<AuthContextType | null>(AuthContext);
-  
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth должен использоваться внутри AuthProvider");
   }
-  
   return context;
-}; 
+};
+
+export default AuthProvider; 

@@ -42,7 +42,7 @@ app.use(cors({
   },
   credentials: true, // Разрешить отправку cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+  allowedHeaders: ['Origin', 'SessionId', 'Set-Cookie', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'Cookie']
 }));
 
 app.use(express.json()); // Парсинг JSON-запросов
