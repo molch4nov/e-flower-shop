@@ -105,7 +105,7 @@ const apiRouter = express.Router();
 apiRouter.use(optionalAuthUser);
 
 apiRouter.use('/auth', require('./auth'));
-apiRouter.use('/users', require('./user'));
+apiRouter.use('/user', require('./user'));
 apiRouter.use('/files', require('./files'));
 apiRouter.use('/flowers', require('./flowers'));
 apiRouter.use('/categories', require('./categories'));

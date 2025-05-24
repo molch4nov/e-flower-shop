@@ -75,7 +75,14 @@ exports.getFileById = async (req, res) => {
     }
 
     res.set('Content-Type', file.mimetype);
-    res.set('Content-Disposition', `attachment; filename="${encodeURIComponent(file.filename)}"`);
+    
+    // Для изображений используем inline для отображения в браузере
+    if (file.mimetype.startsWith('image/')) {
+      res.set('Content-Disposition', `inline; filename="${encodeURIComponent(file.filename)}"`);
+    } else {
+      res.set('Content-Disposition', `attachment; filename="${encodeURIComponent(file.filename)}"`);
+    }
+    
     return res.send(file.file);
   } catch (error) {
     logger.error(error, 'Ошибка при получении файла');

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button, Tooltip } from "@heroui/react";
 import { useCart } from '@/providers/CartProvider';
+import { useAuth } from "@/providers/AuthProvider";
 
-interface File {
+export interface File {
   id: string;
   filename: string;
   mimetype: string;
@@ -30,8 +31,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isImageError, setIsImageError] = useState(false);
   const { addToCart, removeItem, isProductInCart, getProductQuantity, refreshCart } = useCart();
   const [isInCart, setIsInCart] = useState(false);
-  const [cartItemId, setCartItemId] = useState<number | null>(null);
+  const [cartItemId, setCartItemId] = useState<string | null>(null);
   const [productCartQuantity, setProductCartQuantity] = useState(0);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Получаем URL изображения
   const getImageUrl = (file: File | undefined) => {
@@ -78,39 +82,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     );
   };
 
-  // Проверяем наличие товара в корзине
-  useEffect(() => {
-    const checkCartStatus = async () => {
-      const inCart = isProductInCart(product.id);
-      setIsInCart(inCart);
-      
-      if (inCart) {
-        setProductCartQuantity(getProductQuantity(product.id));
-        
-        // Получаем id элемента корзины для возможности удаления
-        try {
-          const response = await fetch("http://localhost:3000/api/cart", {
-            credentials: "include",
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            const cartItem = data.items?.find(
-              (item: any) => item.product_id === Number(product.id)
-            );
-            if (cartItem) {
-              setCartItemId(cartItem.id);
-            }
-          }
-        } catch (error) {
-          console.error("Ошибка при получении данных корзины:", error);
-        }
-      }
-    };
-    
-    checkCartStatus();
-  }, [product.id]);
-
   // Функция добавления в корзину
   const handleAddToCart = async (e: React.MouseEvent | any) => {
     // Если вызывается через onPress кнопки, e может быть не MouseEvent
@@ -119,33 +90,56 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       e.stopPropagation(); // Останавливаем всплытие события
     }
     
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
+    
     try {
       await addToCart(product.id, 1);
       
       // Обновляем состояние
       setIsInCart(true);
+      // Полностью обновляем данные корзины
       await refreshCart();
+      
+      // Проверяем статус товара в корзине снова
+      const inCart = isProductInCart(product.id);
+      if (inCart) {
+        setProductCartQuantity(getProductQuantity(product.id));
+        
+        // Получаем id элемента корзины для возможности удаления
+        const response = await fetch("http://localhost:3000/api/cart", {
+          credentials: "include",
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const cartItem = data.items?.find(
+            (item: any) => item.product_id === String(product.id)
+          );
+          if (cartItem) {
+            setCartItemId(cartItem.id);
+          }
+        }
+      }
     } catch (err) {
       console.error("Ошибка при добавлении в корзину:", err);
     }
   };
   
   // Функция удаления из корзины
-  const handleRemoveFromCart = async (e: React.MouseEvent | any) => {
-    if (e && typeof e.preventDefault === 'function') {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
-    if (!cartItemId) return;
-    
+  const handleRemoveFromCart = async (productId: string) => {
     try {
-      await removeItem(cartItemId);
+      await removeItem(productId);
       
       // Обновляем состояние
       setIsInCart(false);
       setProductCartQuantity(0);
       setCartItemId(null);
+      
+      // Полностью обновляем данные корзины
+      await refreshCart();
     } catch (err) {
       console.error("Ошибка при удалении из корзины:", err);
     }
@@ -185,7 +179,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       )}
       
       {/* Изображение */}
-      <Link to={`/product/${product.id}`} className="relative overflow-hidden w-full aspect-square">
+      <Link to={`/product/${product.id}`} className="relative h-full overflow-hidden w-full aspect-square">
         <div className="absolute inset-0 bg-gray-100 animate-pulse" 
              style={{ opacity: isImageLoaded ? 0 : 1 }} />
         
@@ -196,6 +190,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           className={`w-full h-full object-cover transition-opacity duration-500 ${
             isHovered && product.files.length > 1 ? 'opacity-0' : 'opacity-100'
           }`}
+          style={{ minHeight: '290px' }}
           onLoad={() => setIsImageLoaded(true)}
           onError={handleImageError}
         />
@@ -228,7 +223,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-default-200">
           <div className="text-base font-bold text-primary">{formattedPrice} ₽</div>
           
-          {!isInCart ? (
+          {!isProductInCart(product.id) ? (
             <Button 
               size="sm" 
               color="primary" 
@@ -244,7 +239,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               color="danger" 
               variant="flat"
               className="min-w-0 px-2 text-xs"
-              onPress={handleRemoveFromCart}
+              onPress={() => handleRemoveFromCart(product.id)}
             >
               Удалить
             </Button>

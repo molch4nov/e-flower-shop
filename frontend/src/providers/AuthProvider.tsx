@@ -112,7 +112,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
-
+  
   // Функция для очистки ошибок
   const clearError = () => setError(null);
 

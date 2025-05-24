@@ -64,7 +64,7 @@ class Order {
       SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price,
              p.name AS product_name, p.type AS product_type,
              COALESCE(
-               (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY position LIMIT 1),
+               (SELECT url FROM product_images WHERE product_id = p.id ORDER BY is_main DESC, created_at LIMIT 1),
                '/images/default-product.jpg'
              ) AS image_url
       FROM order_items oi

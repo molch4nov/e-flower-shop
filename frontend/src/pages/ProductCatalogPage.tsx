@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import ProductListGrid from "../modules/product-list-grid";
 import { Button, Input, Select, SelectItem, Chip, Pagination } from "@heroui/react";
 import DefaultLayout from "@/layouts/default";
+import { useCart } from "@/providers/CartProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface File {
   id: string;
@@ -42,6 +44,8 @@ const ITEMS_PER_PAGE = 12;
 
 export default function ProductCatalogPage() {
   const { id: subcategoryId } = useParams();
+  const { refreshCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +56,13 @@ export default function ProductCatalogPage() {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [subcategoryName, setSubcategoryName] = useState("");
+
+  // Обновляем состояние корзины при загрузке страницы
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshCart();
+    }
+  }, [refreshCart, isAuthenticated]);
 
   // Загрузка товаров
   const fetchProducts = useCallback(async () => {

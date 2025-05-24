@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import DefaultLayout from "@/layouts/default";
 import { Button, Image, Divider, Chip, Card, CardBody, Spinner } from "@heroui/react";
 import { useAuth } from "../providers/AuthProvider";
 import { useCart } from "../providers/CartProvider";
 import ReviewForm from "../components/ReviewForm";
+import api from "@/config/api";
 
 interface File {
   id: string;
@@ -54,7 +55,8 @@ interface Product {
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const location = useLocation();
+  const { user, isAuthenticated } = useAuth();
   const { addToCart, removeItem, isProductInCart, getProductQuantity, refreshCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,13 +77,7 @@ export default function ProductDetailPage() {
         setLoading(true);
         setError(null);
         
-        const response = await fetch(`http://localhost:3000/api/products/${id}`);
-        
-        if (!response.ok) {
-          throw new Error("Не удалось загрузить информацию о товаре");
-        }
-        
-        const data = await response.json();
+        const data = await api.get(`/products/${id}`);
         setProduct(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Произошла ошибка при загрузке товара");
@@ -105,18 +101,12 @@ export default function ProductDetailPage() {
         // Получаем id элемента корзины для возможности удаления
         const fetchCartItemId = async () => {
           try {
-            const response = await fetch("http://localhost:3000/api/cart", {
-              credentials: "include",
-            });
-            
-            if (response.ok) {
-              const data = await response.json();
-              const cartItem = data.items?.find(
-                (item: any) => item.product_id === Number(product.id)
-              );
-              if (cartItem) {
-                setProductCartId(cartItem.id);
-              }
+            const data = await api.get("/cart");
+            const cartItem = data.items?.find(
+              (item: any) => String(item.product_id) === product.id
+            );
+            if (cartItem) {
+              setProductCartId(cartItem.id);
             }
           } catch (error) {
             console.error("Ошибка при получении данных корзины:", error);
@@ -131,6 +121,11 @@ export default function ProductDetailPage() {
   // Добавление товара в корзину
   const handleAddToCart = async () => {
     if (!product) return;
+    
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: location } });
+      return;
+    }
     
     try {
       await addToCart(product.id, quantity);
@@ -201,13 +196,7 @@ export default function ProductDetailPage() {
     if (!id) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/api/products/${id}`);
-      
-      if (!response.ok) {
-        throw new Error("Не удалось обновить информацию о товаре");
-      }
-      
-      const data = await response.json();
+      const data = await api.get(`/products/${id}`);
       setProduct(data);
     } catch (err) {
       console.error("Ошибка при обновлении данных товара:", err);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DefaultLayout from "@/layouts/default";
 import { 
@@ -7,8 +7,10 @@ import {
   Divider, 
   Badge, 
   Spinner,
-  Progress
+  Progress,
+  Image
 } from "@heroui/react";
+import api from "@/config/api";
 
 // Типы для заказа
 interface OrderItem {
@@ -49,15 +51,7 @@ const OrderDetailPage = () => {
       try {
         setIsLoading(true);
         
-        const response = await fetch(`/api/orders/${id}`, {
-          credentials: "include",
-        });
-        
-        if (!response.ok) {
-          throw new Error("Не удалось загрузить данные заказа");
-        }
-        
-        const data = await response.json();
+        const data = await api.get(`/orders/${id}`);
         setOrder(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Неизвестная ошибка");
@@ -75,14 +69,7 @@ const OrderDetailPage = () => {
   // Отмена заказа
   const cancelOrder = async () => {
     try {
-      const response = await fetch(`/api/orders/${id}/cancel`, {
-        method: "POST",
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось отменить заказ");
-      }
+      await api.post(`/orders/${id}/cancel`);
       
       // Обновляем статус заказа
       setOrder(prev => prev ? { ...prev, status: "cancelled" } : null);

@@ -10,10 +10,10 @@ export default function DefaultLayout({
   return (
     <div className="relative flex flex-col min-h-screen">
       <Navbar />
-      <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
+      <main className="container mx-auto max-w-7xl px-6 flex-grow pt-10">
         {children}
       </main>
-      <footer className="w-full py-6 bg-default-50 mt-12">
+      <footer className="w-full py-4 bg-default-50 mt-12">
         <div className="container mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>

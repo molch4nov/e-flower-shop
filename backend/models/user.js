@@ -62,6 +62,7 @@ class User {
 
   static async update(id, userData) {
     const { name, email, birth_date, phone_number, role } = userData;
+    console.log(userData);
     
     let query;
     let params;

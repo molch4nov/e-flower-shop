@@ -18,11 +18,7 @@ exports.getUserOrders = async (req, res) => {
 exports.getOrderById = async (req, res) => {
   try {
     const userId = req.user.id;
-    const orderId = parseInt(req.params.id);
-    
-    if (isNaN(orderId)) {
-      return res.status(400).json({ error: 'Некорректный ID заказа' });
-    }
+    const orderId = req.params.id;
     
     const order = await Order.getById(orderId, userId);
     
@@ -78,11 +74,7 @@ exports.createOrder = async (req, res) => {
 exports.cancelOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const orderId = parseInt(req.params.id);
-    
-    if (isNaN(orderId)) {
-      return res.status(400).json({ error: 'Некорректный ID заказа' });
-    }
+    const orderId = req.params.id;
     
     const order = await Order.getById(orderId, userId);
     
@@ -133,12 +125,8 @@ exports.getOrderStats = async (req, res) => {
 
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const orderId = parseInt(req.params.id);
+    const orderId = req.params.id;
     const { status } = req.body;
-    
-    if (isNaN(orderId)) {
-      return res.status(400).json({ error: 'Некорректный ID заказа' });
-    }
     
     if (!status) {
       return res.status(400).json({ error: 'Статус заказа обязателен' });
@@ -167,12 +155,8 @@ exports.updateOrderStatus = async (req, res) => {
 
 exports.updatePaymentStatus = async (req, res) => {
   try {
-    const orderId = parseInt(req.params.id);
+    const orderId = req.params.id;
     const { payment_status } = req.body;
-    
-    if (isNaN(orderId)) {
-      return res.status(400).json({ error: 'Некорректный ID заказа' });
-    }
     
     if (!payment_status) {
       return res.status(400).json({ error: 'Статус оплаты обязателен' });

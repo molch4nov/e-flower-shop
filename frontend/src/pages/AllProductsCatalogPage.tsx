@@ -3,6 +3,8 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import DefaultLayout from "@/layouts/default";
 import ProductListGrid from "../modules/product-list-grid";
 import { Button, Chip, Select, SelectItem, Pagination } from "@heroui/react";
+import { useCart } from "@/providers/CartProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface File {
   id: string;
@@ -44,6 +46,9 @@ export default function AllProductsCatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const observerTarget = useRef<HTMLDivElement>(null);
+  const fetchProductsRef = useRef<((offset?: number, append?: boolean) => Promise<void>) | null>(null);
+  const { refreshCart } = useCart();
+  const { isAuthenticated } = useAuth();
   
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -56,6 +61,13 @@ export default function AllProductsCatalogPage() {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [pageTitle, setPageTitle] = useState("Все товары");
+
+  // Обновляем состояние корзины при загрузке страницы
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshCart();
+    }
+  }, [refreshCart, isAuthenticated]);
 
   // Обработка изменения параметров URL
   useEffect(() => {
@@ -108,13 +120,26 @@ export default function AllProductsCatalogPage() {
       }));
 
       if (append) {
-        setProducts(prev => [...prev, ...formattedData]);
+        setProducts(prev => {
+          // Создаем множество существующих ID для быстрой проверки
+          const existingIds = new Set(prev.map(p => p.id));
+          // Фильтруем только новые товары, которых еще нет в списке
+          const newProducts = formattedData.filter(product => !existingIds.has(product.id));
+          return [...prev, ...newProducts];
+        });
       } else {
         setProducts(formattedData);
       }
       
       // Если вернулось меньше товаров, чем запрошено, значит больше нет
-      setHasMore(formattedData.length === limit);
+      // Для append режима также проверяем что есть хотя бы один новый товар
+      if (append) {
+        const existingIds = new Set(products.map(p => p.id));
+        const actualNewProducts = formattedData.filter(product => !existingIds.has(product.id));
+        setHasMore(formattedData.length === limit && actualNewProducts.length > 0);
+      } else {
+        setHasMore(formattedData.length === limit);
+      }
       
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка загрузки товаров");
@@ -122,20 +147,27 @@ export default function AllProductsCatalogPage() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [sort, loading, loadingMore]);
+  }, [sort]);
+
+  // Обновляем ref при изменении функции
+  useEffect(() => {
+    fetchProductsRef.current = fetchProducts;
+  }, [fetchProducts]);
 
   // Начальная загрузка при монтировании или изменении параметров сортировки
   useEffect(() => {
-    fetchProducts(0, false);
-  }, [fetchProducts, sort]);
+    if (fetchProductsRef.current) {
+      fetchProductsRef.current(0, false);
+    }
+  }, [sort]);
 
   // Настройка Intersection Observer для бесконечной прокрутки
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
         // Если элемент виден и у нас есть еще товары для загрузки
-        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
-          fetchProducts(products.length, true);
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore && fetchProductsRef.current) {
+          fetchProductsRef.current(products.length, true);
         }
       },
       { threshold: 0.5 }
@@ -150,7 +182,7 @@ export default function AllProductsCatalogPage() {
         observer.unobserve(observerTarget.current);
       }
     };
-  }, [products.length, hasMore, fetchProducts, loading, loadingMore]);
+  }, [products.length, hasMore, loading, loadingMore]);
 
   // Обработчик изменения сортировки
   const handleSortChange = (sortValue: string) => {

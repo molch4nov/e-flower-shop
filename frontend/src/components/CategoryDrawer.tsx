@@ -153,20 +153,13 @@ export const CategoryDrawer = ({ isOpen, onClose }: CategoryDrawerProps) => {
       size="full"
     >
       <DrawerContent>
-        <DrawerHeader className="flex justify-between items-center">
+        <DrawerHeader className="flex justify-start items-center">
           {view === 'subcategories' ? (
             <Button variant="light" onPress={handleBack} className="mr-2">←</Button>
           ) : null}
           <h2 className="text-xl font-bold">
             {view === 'categories' ? 'Категории' : selectedCategory?.name || 'Подкатегории'}
           </h2>
-          <Button 
-            variant="light" 
-            onPress={onClose}
-            className="text-default-500"
-          >
-            Закрыть
-          </Button>
         </DrawerHeader>
         
         <DrawerBody className="relative overflow-hidden">
@@ -183,6 +176,11 @@ export const CategoryDrawer = ({ isOpen, onClose }: CategoryDrawerProps) => {
               ) : error && view === 'categories' ? (
                 <div className="flex justify-center items-center h-full text-danger">
                   <p>{error}</p>
+                </div>
+              ) : categories.length === 0 ? (
+                <div className="flex flex-col justify-center items-center h-full">
+                  <p className="text-lg text-gray-500">Категории отсутствуют</p>
+                  <p className="text-sm text-gray-400 mt-2">Попробуйте зайти позже</p>
                 </div>
               ) : (
                 renderCards(categories, (id) => {
@@ -202,6 +200,11 @@ export const CategoryDrawer = ({ isOpen, onClose }: CategoryDrawerProps) => {
               ) : error && view === 'subcategories' ? (
                 <div className="flex justify-center items-center h-full text-danger">
                   <p>{error}</p>
+                </div>
+              ) : subcategories.length === 0 ? (
+                <div className="flex flex-col justify-center items-center h-full">
+                  <p className="text-lg text-gray-500">Подкатегории отсутствуют</p>
+                  <p className="text-sm text-gray-400 mt-2">В данной категории нет подкатегорий</p>
                 </div>
               ) : (
                 renderCards(subcategories, (id) => {

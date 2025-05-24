@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Textarea, Input } from "@heroui/react";
 import { useAuth } from "../providers/AuthProvider";
+import api from "@/config/api";
 
 interface ReviewFormProps {
   isOpen: boolean;
@@ -89,8 +90,6 @@ export default function ReviewForm({ isOpen, onClose, productId, onSuccess }: Re
 
   // Обработка отправки формы
   const handleSubmit = async () => {
-
-  
     if (!user) {
       setError("Необходимо авторизоваться для добавления отзыва");
       return;
@@ -106,44 +105,24 @@ export default function ReviewForm({ isOpen, onClose, productId, onSuccess }: Re
       setError(null);
       
       // Сначала создаем отзыв
-      const reviewResponse = await fetch("http://localhost:3000/api/reviews", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          rating,
-          parent_id: productId
-        }),
-        credentials: "include"
+      const reviewData = await api.post("/reviews", {
+        title,
+        description,
+        rating,
+        parent_id: productId
       });
-      
-      if (!reviewResponse.ok) {
-        throw new Error("Не удалось добавить отзыв");
-      }
-      
-      const reviewData = await reviewResponse.json();
       
       // Если есть фотографии, загружаем их
       if (photos.length > 0) {
         for (const photo of photos) {
-          const formData = new FormData();
-          formData.append("file", new Blob([photo], { type: photo.type }));
-          formData.append("parent_id", reviewData.id);
-          
-          const fileResponse = await fetch("http://localhost:3000/api/files", {
-            method: "POST",
-            body: formData,
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            credentials: "include"
-          });
-          
-          if (!fileResponse.ok) {
-            console.error("Ошибка при загрузке файла", await fileResponse.text());
+          try {
+            const formData = new FormData();
+            formData.append("file", photo);
+            formData.append("parent_id", reviewData.id);
+            
+            await api.upload("/files", formData);
+          } catch (error) {
+            console.error("Ошибка при отправке файла:", error);
           }
         }
       }

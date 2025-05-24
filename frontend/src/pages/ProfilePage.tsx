@@ -18,10 +18,11 @@ import {
   Textarea,
   DatePicker
 } from "@heroui/react";
+import { api } from "../config/api";
 
 // Интерфейсы для типизации данных
 interface Address {
-  id: number;
+  id: string;
   title: string;
   street: string;
   house: string;
@@ -33,7 +34,7 @@ interface Address {
 }
 
 interface Holiday {
-  id: number;
+  id: string;
   name: string;
   date: string;
   notes?: string;
@@ -59,6 +60,7 @@ const ProfilePage = () => {
   
   // Состояние для редактирования профиля
   const [isEditMode, setIsEditMode] = useState(false);
+  console.log(user);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     phone_number: user?.phone_number || "",
@@ -119,15 +121,7 @@ const ProfilePage = () => {
     try {
       setIsLoading(prev => ({ ...prev, addresses: true }));
       
-      const response = await fetch("http://localhost:3000/api/user/addresses", {
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось загрузить адреса");
-      }
-      
-      const data = await response.json();
+      const data = await api.get("/user/addresses");
       setAddresses(data || []);
     } catch (err) {
       setErrors(prev => ({ 
@@ -145,15 +139,7 @@ const ProfilePage = () => {
     try {
       setIsLoading(prev => ({ ...prev, holidays: true }));
       
-      const response = await fetch("http://localhost:3000/api/user/holidays", {
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось загрузить праздники");
-      }
-      
-      const data = await response.json();
+      const data = await api.get("/user/holidays");
       setHolidays(data || []);
     } catch (err) {
       setErrors(prev => ({ 
@@ -171,15 +157,7 @@ const ProfilePage = () => {
     try {
       setIsLoading(prev => ({ ...prev, orders: true }));
       
-      const response = await fetch("http://localhost:3000/api/orders", {
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось загрузить заказы");
-      }
-      
-      const data = await response.json();
+      const data = await api.get("/orders");
       setOrders(data.orders || []);
     } catch (err) {
       setErrors(prev => ({ 
@@ -215,14 +193,7 @@ const ProfilePage = () => {
     try {
       setIsLoading(prev => ({ ...prev, profile: true }));
       
-      const response = await fetch("http://localhost:3000/api/user/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-        credentials: "include",
-      });
+      const response = await api.put("/user/profile", formData);
       
       if (!response.ok) {
         throw new Error("Ошибка при обновлении профиля");
@@ -247,22 +218,10 @@ const ProfilePage = () => {
   // Обработчик отправки формы адреса
   const handleAddressSubmit = async () => {
     try {
-      const method = editingAddress ? "PUT" : "POST";
-      const url = editingAddress 
-        ? `http://localhost:3000/api/user/addresses/${editingAddress.id}` 
-        : "http://localhost:3000/api/user/addresses";
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(addressForm),
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Не удалось ${editingAddress ? "обновить" : "добавить"} адрес`);
+      if (editingAddress) {
+        await api.put(`/user/addresses/${editingAddress.id}`, addressForm);
+      } else {
+        await api.post("/user/addresses", addressForm);
       }
       
       // Обновляем список адресов
@@ -289,22 +248,10 @@ const ProfilePage = () => {
   // Обработчик отправки формы праздника
   const handleHolidaySubmit = async () => {
     try {
-      const method = editingHoliday ? "PUT" : "POST";
-      const url = editingHoliday 
-        ? `http://localhost:3000/api/user/holidays/${editingHoliday.id}` 
-        : "http://localhost:3000/api/user/holidays";
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(holidayForm),
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Не удалось ${editingHoliday ? "обновить" : "добавить"} праздник`);
+      if (editingHoliday) {
+        await api.put(`/user/holidays/${editingHoliday.id}`, holidayForm);
+      } else {
+        await api.post("/user/holidays", holidayForm);
       }
       
       // Обновляем список праздников
@@ -324,16 +271,9 @@ const ProfilePage = () => {
   };
 
   // Установка адреса по умолчанию
-  const setDefaultAddress = async (addressId: number) => {
+  const setDefaultAddress = async (addressId: string) => {
     try {
-      const response = await fetch(`/api/user/addresses/${addressId}/default`, {
-        method: "PUT",
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось установить адрес по умолчанию");
-      }
+      await api.put(`/user/addresses/${addressId}/default`);
       
       // Обновляем список адресов
       await fetchAddresses();
@@ -343,16 +283,9 @@ const ProfilePage = () => {
   };
 
   // Удаление адреса
-  const deleteAddress = async (addressId: number) => {
+  const deleteAddress = async (addressId: string) => {
     try {
-      const response = await fetch(`/api/user/addresses/${addressId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось удалить адрес");
-      }
+      await api.delete(`/user/addresses/${addressId}`);
       
       // Обновляем список адресов
       await fetchAddresses();
@@ -362,16 +295,9 @@ const ProfilePage = () => {
   };
 
   // Удаление праздника
-  const deleteHoliday = async (holidayId: number) => {
+  const deleteHoliday = async (holidayId: string) => {
     try {
-      const response = await fetch(`/api/user/holidays/${holidayId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось удалить праздник");
-      }
+      await api.delete(`/user/holidays/${holidayId}`);
       
       // Обновляем список праздников
       await fetchHolidays();
@@ -749,7 +675,7 @@ const ProfilePage = () => {
                             {new Date(order.created_at).toLocaleDateString()}
                           </td>
                           <td className="py-4 px-4">
-                            {order.total_price.toLocaleString()} ₽
+                            {order.total_price?.toLocaleString()} ₽
                           </td>
                           <td className="py-4 px-4">
                             {getOrderStatusBadge(order.status)}

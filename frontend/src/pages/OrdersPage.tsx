@@ -2,6 +2,7 @@ import { useAuth } from "../providers/AuthProvider";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DefaultLayout from "@/layouts/default";
+import api from "@/config/api";
 import { 
   Card, 
   Button, 
@@ -46,15 +47,7 @@ const OrdersPage = () => {
       try {
         setIsLoading(true);
         
-        const response = await fetch("http://localhost:3000/api/orders", {
-          credentials: "include",
-        });
-        
-        if (!response.ok) {
-          throw new Error("Не удалось загрузить заказы");
-        }
-        
-        const data = await response.json();
+        const data = await api.get("/orders");
         setOrders(data.orders || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Неизвестная ошибка");
@@ -72,14 +65,7 @@ const OrdersPage = () => {
     e.stopPropagation(); // Останавливаем всплытие события
     
     try {
-      const response = await fetch(`/api/orders/${orderId}/cancel`, {
-        method: "POST",
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Не удалось отменить заказ");
-      }
+      await api.post(`/orders/${orderId}/cancel`);
       
       // Обновляем состояние
       setOrders(prevOrders => 

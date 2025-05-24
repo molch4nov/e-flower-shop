@@ -2,8 +2,8 @@ import { ReactNode, createContext, useContext, useEffect, useState, useCallback 
 
 // Типы для корзины
 export interface CartItem {
-  id: number;
-  product_id: number;
+  id: string;
+  product_id: string;
   product_name: string;
   product_price: string;
   quantity: number;
@@ -15,9 +15,9 @@ export interface CartContextType {
   totalItems: number;
   isLoading: boolean;
   error: string | null;
-  addToCart: (productId: number | string, quantity: number) => Promise<void>;
-  updateQuantity: (itemId: number, quantity: number) => Promise<void>;
-  removeItem: (itemId: number) => Promise<void>;
+  addToCart: (productId: string, quantity: number) => Promise<void>;
+  updateQuantity: (itemId: string, quantity: number) => Promise<void>;
+  removeItem: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
   refreshCart: () => Promise<void>;
   isProductInCart: (productId: number | string) => boolean;
@@ -72,11 +72,11 @@ const CartProvider = ({ children }: CartProviderProps) => {
   }, []);
 
   // Обновление количества товара
-  const updateQuantity = useCallback(async (itemId: number, quantity: number): Promise<void> => {
+  const updateQuantity = useCallback(async (itemId: string, quantity: number): Promise<void> => {
     try {
       if (quantity < 1) return;
       
-      const response = await fetch(`http://localhost:3000/api/cart/item/${itemId}`, {
+      const response = await fetch(`http://localhost:3000/api/cart/${itemId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -135,9 +135,14 @@ const CartProvider = ({ children }: CartProviderProps) => {
   }, [fetchCart]);
 
   // Удаление товара из корзины
-  const removeItem = useCallback(async (itemId: number): Promise<void> => {
+  const removeItem = useCallback(async (productId: string): Promise<void> => {
+    console.log(cartItems, productId);
     try {
-      const response = await fetch(`http://localhost:3000/api/cart/item/${itemId}`, {
+      const itemId = cartItems.find(item => item.product_id === productId)?.id;
+      if (!itemId) {
+        throw new Error("Товар не найден в корзине");
+      }
+      const response = await fetch(`http://localhost:3000/api/cart/${itemId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -156,7 +161,7 @@ const CartProvider = ({ children }: CartProviderProps) => {
       setError(err instanceof Error ? err.message : "Неизвестная ошибка при удалении товара");
       console.error("Ошибка при удалении товара:", err);
     }
-  }, [calculateTotalItems]);
+  }, [cartItems]);
 
   // Очистка корзины
   const clearCart = useCallback(async (): Promise<void> => {
@@ -181,12 +186,12 @@ const CartProvider = ({ children }: CartProviderProps) => {
 
   // Проверка, есть ли товар в корзине
   const isProductInCart = useCallback((productId: number | string): boolean => {
-    return cartItems.some(item => item.product_id === Number(productId));
+    return cartItems.some(item => item.product_id === productId);
   }, [cartItems]);
 
   // Получение количества товара в корзине
   const getProductQuantity = useCallback((productId: number | string): number => {
-    const item = cartItems.find(item => item.product_id === Number(productId));
+    const item = cartItems.find(item => item.product_id === productId);
     return item ? item.quantity : 0;
   }, [cartItems]);
 

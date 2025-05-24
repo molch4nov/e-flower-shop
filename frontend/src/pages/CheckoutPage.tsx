@@ -259,12 +259,28 @@ const CheckoutPage = () => {
     try {
       setIsLoading(true);
       
+      // Формируем адрес доставки
+      let deliveryAddress = '';
+      if (useExistingAddress && orderData.delivery_address_id) {
+        const address = userAddresses.find(a => a.id === orderData.delivery_address_id);
+        if (address) {
+          deliveryAddress = `${address.street}, д. ${address.house}, кв. ${address.apartment}`;
+          if (address.entrance) deliveryAddress += `, подъезд ${address.entrance}`;
+          if (address.floor) deliveryAddress += `, этаж ${address.floor}`;
+        }
+      } else if (orderData.delivery_address) {
+        const addr = orderData.delivery_address;
+        deliveryAddress = `${addr.street}, д. ${addr.house}, кв. ${addr.apartment}`;
+        if (addr.entrance) deliveryAddress += `, подъезд ${addr.entrance}`;
+        if (addr.floor) deliveryAddress += `, этаж ${addr.floor}`;
+      }
+      
       const orderPayload = {
-        ...orderData,
-        items: cartItems.map(item => ({
-          product_id: item.product_id,
-          quantity: item.quantity
-        }))
+        delivery_address: deliveryAddress,
+        delivery_date: orderData.delivery_date,
+        delivery_time: orderData.delivery_time,
+        payment_method: orderData.payment_method,
+        notes: orderData.comment || null
       };
       
       const response = await fetch("http://localhost:3000/api/orders", {
@@ -277,18 +293,15 @@ const CheckoutPage = () => {
       });
       
       if (!response.ok) {
-        throw new Error("Не удалось создать заказ");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Не удалось создать заказ");
       }
       
       const result = await response.json();
       setOrderSuccess(true);
-      setOrderNumber(result.order_id);
+      setOrderNumber(result.order_number || result.id);
       
-      // Очищаем корзину после успешного заказа
-      await fetch("http://localhost:3000/api/cart/clear", {
-        method: "DELETE",
-        credentials: "include"
-      });
+      // Очищаем корзину после успешного заказа уже происходит на бэкенде
       
     } catch (err) {
       setError(err instanceof Error ? err.message : "Неизвестная ошибка");

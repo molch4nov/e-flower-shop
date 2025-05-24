@@ -56,11 +56,7 @@ exports.getAddresses = async (req, res) => {
 exports.getAddressById = async (req, res) => {
   try {
     const userId = req.user.id;
-    const addressId = parseInt(req.params.id);
-    
-    if (isNaN(addressId)) {
-      return res.status(400).json({ error: 'Некорректный ID адреса' });
-    }
+    const addressId = req.params.id;
     
     const address = await User.getAddressById(addressId, userId);
     
@@ -106,11 +102,7 @@ exports.createAddress = async (req, res) => {
 exports.updateAddress = async (req, res) => {
   try {
     const userId = req.user.id;
-    const addressId = parseInt(req.params.id);
-    
-    if (isNaN(addressId)) {
-      return res.status(400).json({ error: 'Некорректный ID адреса' });
-    }
+    const addressId = req.params.id;
     
     const { title, street, house, apartment, entrance, floor, is_default, notes } = req.body;
     
@@ -146,11 +138,7 @@ exports.updateAddress = async (req, res) => {
 exports.deleteAddress = async (req, res) => {
   try {
     const userId = req.user.id;
-    const addressId = parseInt(req.params.id);
-    
-    if (isNaN(addressId)) {
-      return res.status(400).json({ error: 'Некорректный ID адреса' });
-    }
+    const addressId = req.params.id;
     
     const address = await User.getAddressById(addressId, userId);
     
@@ -170,11 +158,7 @@ exports.deleteAddress = async (req, res) => {
 exports.setAddressAsDefault = async (req, res) => {
   try {
     const userId = req.user.id;
-    const addressId = parseInt(req.params.id);
-    
-    if (isNaN(addressId)) {
-      return res.status(400).json({ error: 'Некорректный ID адреса' });
-    }
+    const addressId = req.params.id;
     
     const address = await User.getAddressById(addressId, userId);
     
@@ -207,11 +191,7 @@ exports.getHolidays = async (req, res) => {
 exports.getHolidayById = async (req, res) => {
   try {
     const userId = req.user.id;
-    const holidayId = parseInt(req.params.id);
-    
-    if (isNaN(holidayId)) {
-      return res.status(400).json({ error: 'Некорректный ID праздника' });
-    }
+    const holidayId = req.params.id;
     
     const holiday = await User.getHolidayById(holidayId, userId);
     
@@ -252,11 +232,7 @@ exports.createHoliday = async (req, res) => {
 exports.updateHoliday = async (req, res) => {
   try {
     const userId = req.user.id;
-    const holidayId = parseInt(req.params.id);
-    
-    if (isNaN(holidayId)) {
-      return res.status(400).json({ error: 'Некорректный ID праздника' });
-    }
+    const holidayId = req.params.id;
     
     const { name, date, notes } = req.body;
     
@@ -287,11 +263,7 @@ exports.updateHoliday = async (req, res) => {
 exports.deleteHoliday = async (req, res) => {
   try {
     const userId = req.user.id;
-    const holidayId = parseInt(req.params.id);
-    
-    if (isNaN(holidayId)) {
-      return res.status(400).json({ error: 'Некорректный ID праздника' });
-    }
+    const holidayId = req.params.id;
     
     const holiday = await User.getHolidayById(holidayId, userId);
     

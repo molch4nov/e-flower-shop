@@ -24,13 +24,16 @@ const LoginPage = () => {
   // Состояние для видимости пароля
   const [isVisible, setIsVisible] = useState(false);
 
+  // Состояние для отслеживания попыток входа
+  const [hasTriedLogin, setHasTriedLogin] = useState(false);
+
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
 
   // Функция для отображения ошибки с соответствующей иконкой
   const renderError = () => {
-    if (!error) return null;
+    if (!error || !hasTriedLogin) return null;
     
     let iconName = "solar:danger-triangle-bold";
     let colorClass = "text-danger";
@@ -96,11 +99,14 @@ const LoginPage = () => {
     }
     
     clearError(); // Очищаем ошибку при изменении данных
+    setHasTriedLogin(false); // Сбрасываем флаг попытки входа
   };
 
   // Обработчик отправки формы
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    setHasTriedLogin(true);
     
     try {
       await login(formData);

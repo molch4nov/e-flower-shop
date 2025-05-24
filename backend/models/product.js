@@ -51,15 +51,23 @@ class Product {
       console.log('product', product);
       
       if (product) {
-        // Получение отзывов
-        product.reviews = await Review.getByParent(id, 'product');
-        // Получение файлов
-        product['files'] = await File.getByParent(id, 'product');
-        // Для букетов получаем состав
+        const reviewPromise = Review.getByParent(id, 'product');
+        const filePromise = File.getByParent(id, 'product');
+        const bouquetFlowersPromise = this.getBouquetFlowers(product.id);
+
+        const [reviews, files, flowers] = await Promise.allSettled([reviewPromise, filePromise, bouquetFlowersPromise]);
+        console.log('reviews', reviews.value);
+        console.log('files', files.value);
+        console.log('flowers', flowers.value);
+        console.log('product.id', product.id);
+        product.reviews = reviews.value;  
+        product['files'] = files.value;
         if (product.type === 'bouquet') {
-          product.flowers = await this.getBouquetFlowers(product.id);
+          product.flowers = flowers.value;
         }
       }
+
+      console.log('Final product:', product);
       
       return product;
     } catch (error) {

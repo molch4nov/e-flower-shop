@@ -149,6 +149,8 @@ exports.getCurrentUser = async (req, res) => {
     
     // Получаем адреса пользователя
     const addresses = await User.getAddresses(user.id);
+
+    console.log(user);
     
     res.json({
       user: {
@@ -156,7 +158,8 @@ exports.getCurrentUser = async (req, res) => {
         name: user.name,
         phone_number: user.phone_number,
         birth_date: user.birth_date,
-        role: user.role
+        role: user.role,
+        email: user.email
       },
       holidays,
       addresses
@@ -170,11 +173,11 @@ exports.getCurrentUser = async (req, res) => {
 // Обновление информации пользователя
 exports.updateUser = async (req, res) => {
   try {
-    const { name, birth_date } = req.body;
+    const { name, birth_date, email, phone_number } = req.body;
     const userId = req.user.id;
     
     // Обновляем информацию о пользователе
-    const updatedUser = await User.update(userId, { name, birth_date });
+    const updatedUser = await User.update(userId, { name, birth_date, email, phone_number });
     
     res.json({
       message: 'Информация обновлена',

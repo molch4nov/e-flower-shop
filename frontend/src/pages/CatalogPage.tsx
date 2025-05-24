@@ -3,6 +3,8 @@ import DefaultLayout from "@/layouts/default";
 import ProductListGrid from "../modules/product-list-grid";
 import { Divider, Button } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/providers/CartProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface File {
   id: string;
@@ -25,12 +27,21 @@ interface ProductItem {
 
 const CatalogPage = () => {
   const navigate = useNavigate();
+  const { refreshCart, isLoading: cartLoading } = useCart();
+  const { isAuthenticated } = useAuth();
   const [popularProducts, setPopularProducts] = useState<ProductItem[]>([]);
   const [topRatedProducts, setTopRatedProducts] = useState<ProductItem[]>([]);
   const [loadingPopular, setLoadingPopular] = useState(true);
   const [loadingTopRated, setLoadingTopRated] = useState(true);
   const [errorPopular, setErrorPopular] = useState<string | null>(null);
   const [errorTopRated, setErrorTopRated] = useState<string | null>(null);
+
+  // Обновляем состояние корзины при загрузке страницы
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshCart();
+    }
+  }, [refreshCart, isAuthenticated]);
 
   // Загрузка популярных товаров
   useEffect(() => {
@@ -98,9 +109,7 @@ const CatalogPage = () => {
 
   return (
     <DefaultLayout>
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6">Каталог цветов и букетов</h1>
-        
+      <div className="max-w-7xl mx-auto px-3 sm:px-4">        
         {/* Раздел с популярными товарами */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
@@ -152,50 +161,7 @@ const CatalogPage = () => {
         </section>
         
         {/* Категории букетов и цветов */}
-        <section className="mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-6">Категории</h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <div 
-              className="bg-primary-100 rounded-xl p-6 flex flex-col items-center cursor-pointer hover:bg-primary-200 transition-colors"
-              onClick={() => navigate("/catalog/bouquets")}
-            >
-              <div className="text-primary mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold mb-2">Букеты</h3>
-              <p className="text-center text-default-600">Уникальные цветочные композиции для любого случая</p>
-            </div>
-            
-            <div 
-              className="bg-success-100 rounded-xl p-6 flex flex-col items-center cursor-pointer hover:bg-success-200 transition-colors"
-              onClick={() => navigate("/catalog/flowers")}
-            >
-              <div className="text-success mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold mb-2">Цветы</h3>
-              <p className="text-center text-default-600">Свежие цветы различных сортов и оттенков</p>
-            </div>
-            
-            <div 
-              className="bg-warning-100 rounded-xl p-6 flex flex-col items-center cursor-pointer hover:bg-warning-200 transition-colors"
-              onClick={() => navigate("/catalog/gifts")}
-            >
-              <div className="text-warning mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold mb-2">Подарки</h3>
-              <p className="text-center text-default-600">Дополнения к букетам для особых случаев</p>
-            </div>
-          </div>
-        </section>
+        
       </div>
     </DefaultLayout>
   );
